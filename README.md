@@ -42,5 +42,5 @@ The Binding Templates defined inside the thing descriptions describe how to inte
 
 ## Postman Collection
 
-The following [Postman collection](https://www.postman.com/orange-comet-247459/workspace/acquaount/folder/18279882-80088dcf-0b1c-4044-8069-42c0ed69df54?action=share&creator=18279882&ctx=documentation&active-environment=18279882-323a6765-edb5-4478-9a82-0a3bd63b827f) contains examples on how to interact with WoT-Server.
+The following [Postman collection](https://www.postman.com/orange-comet-247459/workspace/wot-server-example-endpoints/collection/18279882-309079ec-7ba2-4c14-9d69-3f89b1fe321c?action=share&creator=18279882&active-environment=18279882-52d6afdd-3ec1-40b0-976d-2115edbda08d) contains examples on how to interact with WoT-Server.
 
