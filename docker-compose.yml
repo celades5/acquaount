@@ -26,15 +26,6 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
 
-  acquaount-datastreams-init:
-    build:
-      context: src/resources/databaseInitialisation/
-      dockerfile: Dockerfile
-    depends_on:
-      - acquaount-platform
-    environment:
-      - PYTHONUNBUFFERED=1
-
   sensorthings-api:
     image: fraunhoferiosb/frost-server:2.0
     environment:

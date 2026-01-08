@@ -1,11 +1,17 @@
 # ACQUAOUNT WoT-Server
-Node.js version required: **v18.12.0**    
-To run server only locally:
->npm install  
->node src/main/server.js src/resources/configs/prod.json
- 
-To deploy:
->docker compose up --build -d  
+## Prerequisites
+Docker and Docker Compose are required in order to run WoT-Server. Running the Compose project will automatically create an environment in which all necessary installations will be performed.
+
+To run/deploy:
+>docker compose up --build -d
+
+This will deploy the main server and its dependencies: The SensorThings server, the PostGIS database, and a service to fetch data from external platforms.  
+The default exposed ports for this deployment are:
+ + WoT-Server: Port 2080
+ + SensorThings Server: Ports 8008 and 1883
+  
+These ports can be changed in the docker-compose.yml file.
+
 
 ## Statement Of Need
 WoT-Server was created as a centralised data management solution for the ACQUAOUNT Project. One of the objectives of the ACQUAOUNT Project is providing smart irrigation recommendations to farmers using a water balance model. This model takes as input timeseries data of different properties of the specified field, such as temperature, soil moisture and wind speed, and calculates the best date and amount of irrigation. WoT-Server was developed as a standardized API to allow easy access to faming/water management data for further model implementation and to simplify the upload, storage and retrieval procedures of measurements from sensors in the field. WoT-Server is capable of both receiving data via an HTTP endpoint or fetching the data itself from other API services, a feature useful for centralising data from multiple platforms.  
