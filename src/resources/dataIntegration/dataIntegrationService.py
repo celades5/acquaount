@@ -20,7 +20,7 @@ if len(sys.argv) >= 2:
         # platform_url = "http://acquaount-platform:80"
 
 import zentracloud
-# import fieldclimate
+import fieldclimate
 import iradata
 import vanwalt
 import elard
@@ -284,9 +284,8 @@ if __name__ in "__main__":
             "00204EB1"
         ]
         for station in fieldclimate_stations:
-            # station_job = create_job(f"FieldClimate{station}",fieldclimate.get_function(station),send_timeseries_data,f"AcquaountLebanon{station}")
-            # daily_jobs.append(station_job)
-            pass
+            station_job = create_job(f"FieldClimate{station}",fieldclimate.get_function(station),send_timeseries_data,f"AcquaountLebanon{station}")
+            daily_jobs.append(station_job)
 
         with open("iradata_specification.json", "r") as f:
             iradata_info = json.loads(f.read())
