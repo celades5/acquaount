@@ -1,3 +1,4 @@
 {
-  "urlhost": "http://localhost:8008"
+  "urlhost": "http://localhost:8008",
+  "baseurl": "http://84.88.76.18"
 }

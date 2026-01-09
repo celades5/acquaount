@@ -40,6 +40,7 @@ if (args.length === 0) {
 console.log("Configuration filename:", args[0]);
 let config = readJsonFileSync(args[0]);
 const urlhost = config['urlhost'];
+const config_baseurl = config['baseurl'];
 const froststring = "/FROST-Server/v1.1"
 const baseurl = urlhost + froststring
 console.log("Database url:", baseurl)
@@ -146,7 +147,7 @@ async function fetchAllPagesFromDatabase(database_url) {
                 let nextLink = body["@iot.nextLink"];
                 while(nextLink !== null)
                 {
-                    
+
                     nextLink = nextLink.replace("http://localhost:8008/FROST-Server/v1.1", baseurl);
                     let nextBody = await fetch(nextLink).then(function (response) {
                         if (response.ok) {
@@ -161,12 +162,12 @@ async function fetchAllPagesFromDatabase(database_url) {
                     }else
                     {
                         nextLink = null;
-                    }                    
-                    
+                    }
+
                 }
             }
             return body;
-                        
+
         }
         throw new Error('Request failed');
     }).then(function (data) {
@@ -207,8 +208,8 @@ function postToDatabase(database_url, data) {
             throw new Error('Request failed');
         });
         }
-        
-        
+
+
     }).then(function (data) {
         return data;
     }).catch(function (error) {
@@ -376,7 +377,7 @@ async function fetchBasinInformation(itemName) {
         // Note: The datastream AVG_WEEKLY_ENAS_10329_Water_Storage_m3 is inside the Cantoniera Reservoir item
         console.log(`[DEBUG] Fetching ENAS datastream from itemName: ${itemName}`);
         console.log(`[DEBUG] Looking for datastream: AVG_WEEKLY_ENAS_10329_Water_Storage_m3`);
-        
+
         let enasWeeklyStorage_observations;
         try {
             enasWeeklyStorage_observations = await fetchAllObservationsInDatastreamInRange(itemName, "AVG_WEEKLY_ENAS_10329_Water_Storage_m3", formatDate(now),"", 1000, 0);
@@ -385,22 +386,22 @@ async function fetchBasinInformation(itemName) {
             console.log(`[ERROR] Failed to fetch ENAS data:`, error.message);
             enasWeeklyStorage_observations = undefined;
         }
-        
+
         // If no ENAS data for current period, try to get latest available data from past months
         if (!enasWeeklyStorage_observations || enasWeeklyStorage_observations.length === 0) {
             console.log(`[DEBUG] No ENAS data found for current period, trying to fetch latest available data...`);
-            
+
             try {
                 // Try to get data from the last 6 months to find the most recent available data
                 let sixMonthsAgo = new Date();
                 sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
-                
+
                 enasWeeklyStorage_observations = await fetchAllObservationsInDatastreamInRange(
-                    itemName, 
-                    "AVG_WEEKLY_ENAS_10329_Water_Storage_m3", 
-                    formatDate(sixMonthsAgo), 
-                    formatDate(now), 
-                    1000, 
+                    itemName,
+                    "AVG_WEEKLY_ENAS_10329_Water_Storage_m3",
+                    formatDate(sixMonthsAgo),
+                    formatDate(now),
+                    1000,
                     0
                 );
                 console.log(`[DEBUG] ENAS fetch result for last 6 months:`, enasWeeklyStorage_observations);
@@ -408,21 +409,21 @@ async function fetchBasinInformation(itemName) {
                 console.log(`[ERROR] Failed to fetch ENAS data for last 6 months:`, error.message);
                 enasWeeklyStorage_observations = undefined;
             }
-            
+
             // If still no data, try to get ANY available data from the last 2 years
             if (!enasWeeklyStorage_observations || enasWeeklyStorage_observations.length === 0) {
                 console.log(`[DEBUG] Still no ENAS data found in last 6 months, trying to fetch ANY available data from last 2 years...`);
-                
+
                 try {
                     let twoYearsAgo = new Date();
                     twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
-                    
+
                     enasWeeklyStorage_observations = await fetchAllObservationsInDatastreamInRange(
-                        itemName, 
-                        "AVG_WEEKLY_ENAS_10329_Water_Storage_m3", 
-                        formatDate(twoYearsAgo), 
-                        formatDate(now), 
-                        1000, 
+                        itemName,
+                        "AVG_WEEKLY_ENAS_10329_Water_Storage_m3",
+                        formatDate(twoYearsAgo),
+                        formatDate(now),
+                        1000,
                         0
                     );
                     console.log(`[DEBUG] ENAS fetch result for last 2 years:`, enasWeeklyStorage_observations);
@@ -442,7 +443,7 @@ async function fetchBasinInformation(itemName) {
         }
         // Process data by month
         let basin_data = [];
-        
+
         function getMonthKey(timestamp) {
             const date = new Date(timestamp);
             return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-02T08:02:26.380Z`;
@@ -455,11 +456,11 @@ async function fetchBasinInformation(itemName) {
             if (!Array.isArray(observations) || observations.length === 0) {
                 return;
             }
-            
+
             observations.forEach(obs => {
                 const monthKey = getMonthKey(obs.time_of_measure);
                 const key = `${monthKey}_${measure_type}`;
-                
+
                 if (!aggregatedData.has(key)) {
                     aggregatedData.set(key, {
                         "datetime": monthKey,
@@ -471,7 +472,7 @@ async function fetchBasinInformation(itemName) {
                         "mean": ""
                     });
                 }
-                
+
                 const record = aggregatedData.get(key);
                 record[valueKey] = obs.value.toString();
             });
@@ -481,16 +482,16 @@ async function fetchBasinInformation(itemName) {
         addToAggregatedData(minInflow_observations, "inflow", "M3/S", "forecast", "min");
         addToAggregatedData(maxInflow_observations, "inflow", "M3/S", "forecast", "max");
         addToAggregatedData(meanInflow_observations, "inflow", "M3/S", "forecast", "mean");
-        
+
         addToAggregatedData(minOutflow_observations, "outflow", "M3/S", "forecast", "min");
         addToAggregatedData(maxOutflow_observations, "outflow", "M3/S", "forecast", "max");
         addToAggregatedData(meanOutflow_observations, "outflow", "M3/S", "forecast", "mean");
-        
+
         // Debug: Show what storage data is available
         console.log(`[DEBUG] Min storage observations:`, minStorage_observations);
         console.log(`[DEBUG] Max storage observations:`, maxStorage_observations);
         console.log(`[DEBUG] Mean storage observations:`, meanStorage_observations);
-        
+
         if (minStorage_observations && minStorage_observations.length > 0) {
             console.log(`[DEBUG] Min storage data dates:`, minStorage_observations.map(obs => obs.time_of_measure));
         }
@@ -500,7 +501,7 @@ async function fetchBasinInformation(itemName) {
         if (meanStorage_observations && meanStorage_observations.length > 0) {
             console.log(`[DEBUG] Mean storage data dates:`, meanStorage_observations.map(obs => obs.time_of_measure));
         }
-        
+
         addToAggregatedData(minStorage_observations, "storage", "1000 M3", "forecast", "min");
         addToAggregatedData(maxStorage_observations, "storage", "1000 M3", "forecast", "max");
         addToAggregatedData(meanStorage_observations, "storage", "1000 M3", "forecast", "mean");
@@ -509,22 +510,22 @@ async function fetchBasinInformation(itemName) {
         // Note: September might not appear in the endpoint response, but we update it if it exists
         console.log(`[DEBUG] ENAS weekly storage observations:`, enasWeeklyStorage_observations);
         console.log(`[DEBUG] ENAS data length:`, enasWeeklyStorage_observations ? enasWeeklyStorage_observations.length : 'undefined');
-        
+
         // Variables for September update (declared outside if block for verification access)
         let latestENASValue = null;
         let latestENASDate = null;
         let septemberYear = new Date().getFullYear();
-        
+
         if (enasWeeklyStorage_observations && Array.isArray(enasWeeklyStorage_observations) && enasWeeklyStorage_observations.length > 0) {
             // Find the most recent value from ENAS weekly storage data (latest available sensor reading)
             // Sort by date to get the most recent observation
             enasWeeklyStorage_observations.sort((a, b) => new Date(b.time_of_measure) - new Date(a.time_of_measure));
             latestENASValue = enasWeeklyStorage_observations[0].value;
             latestENASDate = enasWeeklyStorage_observations[0].time_of_measure;
-            
+
             console.log(`[DEBUG] Latest ENAS sensor value:`, latestENASValue);
             console.log(`[DEBUG] Latest ENAS sensor date:`, latestENASDate);
-            
+
             // Update September storage data only (hardcoded to September)
             // Determine the correct year - use the year from the first storage observation if available
             if (minStorage_observations && minStorage_observations.length > 0) {
@@ -538,16 +539,16 @@ async function fetchBasinInformation(itemName) {
                     septemberYear = firstStorageDate.getFullYear();
                 }
             }
-            
+
             const septemberKey = `${septemberYear}-09-02T08:02:26.380Z`;
             const septemberStorageKey = `${septemberKey}_storage`;
             console.log(`[DEBUG] Looking for September key: ${septemberStorageKey} (year: ${septemberYear})`);
             console.log(`[DEBUG] Available keys:`, Array.from(aggregatedData.keys()));
-            
+
             let septemberData;
             if (aggregatedData.has(septemberStorageKey)) {
                 septemberData = aggregatedData.get(septemberStorageKey);
-                
+
                 // Show September data BEFORE update
                 console.log(`[DEBUG] ========== SEPTEMBER DATA BEFORE UPDATE ==========`);
                 console.log(`[DEBUG] September datetime: ${septemberData.datetime}`);
@@ -555,17 +556,17 @@ async function fetchBasinInformation(itemName) {
                 console.log(`[DEBUG] September max (BEFORE): ${septemberData.max}`);
                 console.log(`[DEBUG] September mean (BEFORE): ${septemberData.mean}`);
                 console.log(`[DEBUG] ====================================================`);
-                
+
                 // Store original values for comparison
                 const originalMin = septemberData.min;
                 const originalMax = septemberData.max;
                 const originalMean = septemberData.mean;
-                
+
                 // Update all three metrics (min, max, mean) to the same ENAS sensor value
                 septemberData.min = latestENASValue.toString();
                 septemberData.max = latestENASValue.toString();
                 septemberData.mean = latestENASValue.toString();
-                
+
             } else {
                 // Create September if it doesn't exist (even though it won't be in response)
                 console.log(`[DEBUG] September storage key not found - CREATING September entry internally`);
@@ -581,7 +582,7 @@ async function fetchBasinInformation(itemName) {
                 aggregatedData.set(septemberStorageKey, septemberData);
                 console.log(`[DEBUG] Created September entry internally (will not appear in response)`);
             }
-            
+
             // Show September data AFTER update/creation
             console.log(`[DEBUG] ========== SEPTEMBER DATA (FINAL VALUES) ==========`);
             console.log(`[DEBUG] September datetime: ${septemberData.datetime}`);
@@ -603,7 +604,7 @@ async function fetchBasinInformation(itemName) {
         const nonSeptemberKeys = allStorageKeys.filter(key => !key.includes('09-02T08:02:26.380Z'));
         console.log(`[DEBUG] Total storage months: ${allStorageKeys.length}`);
         console.log(`[DEBUG] Non-September months (should remain unchanged): ${nonSeptemberKeys.length}`);
-        
+
         // Specifically check October to ensure it wasn't accidentally modified
         if (latestENASValue !== null) {
             const octoberKey = `${septemberYear}-10-02T08:02:26.380Z_storage`;
@@ -624,7 +625,7 @@ async function fetchBasinInformation(itemName) {
                 }
             }
         }
-        
+
         if (nonSeptemberKeys.length > 0) {
             console.log(`[DEBUG] Sample of other months (first 3):`);
             nonSeptemberKeys.slice(0, 3).forEach(key => {
@@ -633,36 +634,36 @@ async function fetchBasinInformation(itemName) {
             });
         }
         console.log(`[DEBUG] ====================================================`);
-        
+
         // Debug: Show what months are available in aggregated data
         console.log(`[DEBUG] All available keys in aggregated data:`, Array.from(aggregatedData.keys()));
         console.log(`[DEBUG] Number of data points:`, aggregatedData.size);
-        
+
         // Convert Map values to array
         basin_data = Array.from(aggregatedData.values());
-        
+
         // Debug: Show what data we have before organization
         console.log(`[DEBUG] Basin data before organization:`, basin_data);
-        
+
         // Reorganize data: group by measurement type, then by datetime
         const organizedData = [];
         const measurementTypes = ["inflow", "outflow", "storage"];
-        
+
         measurementTypes.forEach(measureType => {
             // Get all data for this measurement type
             const measureData = basin_data.filter(item => item.measure === measureType);
             console.log(`[DEBUG] ${measureType} data:`, measureData);
-            
+
             // Sort by datetime (oldest to newest)
             measureData.sort((a, b) => new Date(a.datetime) - new Date(b.datetime));
-            
+
             // Add to organized data
             organizedData.push(...measureData);
         });
-        
+
         console.log(`[DEBUG] Final organized data:`, organizedData);
         console.log(`[DEBUG] Total data points in response:`, organizedData.length);
-        
+
         return {
             "data": organizedData
         };
@@ -699,7 +700,7 @@ async function fetchHistoricalData(itemName) {
         } else if (itemName.toLowerCase().includes('volume')) {
             itemType = 'volume';
         }
-        
+
         // Define the Excel files and their configurations
         const excelFiles = [
             {
@@ -734,7 +735,7 @@ async function fetchHistoricalData(itemName) {
                 }
 
                 const workbook = XLSX.readFile(fileConfig.path);
-                
+
                 // Process the configured sheet for this file
                 let sheetName;
                 if (fileConfig.sheetIndex !== undefined) {
@@ -756,33 +757,33 @@ async function fetchHistoricalData(itemName) {
                     console.log(`[DEBUG] No sheet configuration found for ${fileConfig.type}`);
                     continue;
                 }
-                
+
                 console.log(`[DEBUG] Processing sheet "${sheetName}" from ${fileConfig.path}`);
                 const sheet = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
-                
+
                 // Check if this sheet has the expected month column format (either 'month-year' or 'Month')
                 const firstRow = sheet[0];
-                const monthColumnName = firstRow && (firstRow['month-year'] || firstRow['Month']) ? 
+                const monthColumnName = firstRow && (firstRow['month-year'] || firstRow['Month']) ?
                     (firstRow['month-year'] ? 'month-year' : 'Month') : null;
-                
+
                 if (!firstRow || !monthColumnName) {
                     continue;
                 }
-                    
+
                     // Process each row in the sheet
                     sheet.forEach((row, index) => {
                         // Skip header rows (rows without month data)
                         if (!row || !row[monthColumnName]) {
                             return;
                         }
-                        
+
                         // Extract month-year from the month column
                         const monthYear = row[monthColumnName];
                         if (!monthYear) return;
 
-                        
+
                         // Determine unit based on file type and sheet name
-                        let determinedUnit = ''; 
+                        let determinedUnit = '';
 
                         // Try different possible column name patterns based on Excel structure
                         let maxValue, minValue, avgValue;
@@ -819,7 +820,7 @@ async function fetchHistoricalData(itemName) {
                         if (!maxValue && !minValue && !avgValue) {
                             const allKeys = Object.keys(row);
                             const matchingKeys = allKeys.filter(key => key.toLowerCase().includes(fileConfig.type.toLowerCase()));
-                            
+
                             // Try to find max/min/avg in these columns
                             matchingKeys.forEach(key => {
                                 if (key.toLowerCase().includes('max') && !maxValue) {
@@ -886,21 +887,21 @@ async function fetchHistoricalData(itemName) {
                         } catch (e) {
                             return; // Skip this row if date parsing fails
                         }
-                        
+
                         // Group by month and collect all values for statistics
                         const monthDataKey = `${monthKey}_${fileConfig.type}_${determinedUnit}`;
-                        
+
                         if (!monthlyData.has(monthDataKey)) {
                             monthlyData.set(monthDataKey, {
                                 month: monthKey,
                                 measure: fileConfig.type,
-                                unit: determinedUnit, 
+                                unit: determinedUnit,
                                 values: []
                             });
                         }
 
                         const monthRecord = monthlyData.get(monthDataKey);
-                        
+
                         // Helper function to validate and parse values - filters out 0, empty cells, and NaN
                         const isValidValue = (value, valueType, monthYear) => {
                             // Check for undefined, null, or empty string
@@ -908,50 +909,50 @@ async function fetchHistoricalData(itemName) {
                                 console.log(`[DEBUG] Skipping ${valueType} value for ${monthYear}: empty cell (${value})`);
                                 return null;
                             }
-                            
+
                             // Check if it's already NaN before parsing
                             if (typeof value === 'number' && isNaN(value)) {
                                 console.log(`[DEBUG] Skipping ${valueType} value for ${monthYear}: NaN`);
                                 return null;
                             }
-                            
+
                             // Parse the value
                             const parsedValue = parseFloat(value);
-                            
+
                             // Check if parsing resulted in NaN
                             if (isNaN(parsedValue)) {
                                 console.log(`[DEBUG] Skipping ${valueType} value for ${monthYear}: parsed as NaN (${value})`);
                                 return null;
                             }
-                            
+
                             // Check if value is exactly 0 (likely empty cell artifact)
                             if (parsedValue === 0) {
                                 console.log(`[DEBUG] Skipping ${valueType} value for ${monthYear}: exactly 0 (likely empty cell)`);
                                 return null;
                             }
-                            
+
                             // Also check for Infinity values (shouldn't happen but good to filter)
                             if (!isFinite(parsedValue)) {
                                 console.log(`[DEBUG] Skipping ${valueType} value for ${monthYear}: Infinity (${value})`);
                                 return null;
                             }
-                            
+
                             // Valid value
                             return parsedValue;
                         };
-                        
+
                         // Process max value
                         const validMax = isValidValue(maxValue, 'max', monthYear);
                         if (validMax !== null) {
                             monthRecord.values.push({ type: 'max', value: validMax });
                         }
-                        
+
                         // Process min value
                         const validMin = isValidValue(minValue, 'min', monthYear);
                         if (validMin !== null) {
                             monthRecord.values.push({ type: 'min', value: validMin });
                         }
-                        
+
                         // Process avg value
                         const validAvg = isValidValue(avgValue, 'avg', monthYear);
                         if (validAvg !== null) {
@@ -959,12 +960,12 @@ async function fetchHistoricalData(itemName) {
                         }
 
                     });
-                    
+
             } catch (fileError) {
                 // Continue with other files
             }
         }
-                
+
         // Process monthly data for all file types
         const monthlyResults = [];
         for (const [key, monthRecord] of monthlyData) {
@@ -972,38 +973,38 @@ async function fetchHistoricalData(itemName) {
             if (monthRecord.values.length === 0) {
                 continue;
             }
-            
+
             // Calculate statistics for this month
             const maxValues = monthRecord.values.filter(v => v.type === 'max').map(v => v.value);
             const minValues = monthRecord.values.filter(v => v.type === 'min').map(v => v.value);
             const avgValues = monthRecord.values.filter(v => v.type === 'avg').map(v => v.value);
-            
+
             // Debug: Show what values are being used for calculation
             console.log(`[DEBUG] Month: ${monthRecord.month}, Measure: ${monthRecord.measure}`);
             console.log(`[DEBUG]   Max values count: ${maxValues.length}, Values: [${maxValues.slice(0, 5).join(', ')}${maxValues.length > 5 ? '...' : ''}]`);
             console.log(`[DEBUG]   Min values count: ${minValues.length}, Values: [${minValues.slice(0, 5).join(', ')}${minValues.length > 5 ? '...' : ''}]`);
             console.log(`[DEBUG]   Avg values count: ${avgValues.length}, Values: [${avgValues.slice(0, 5).join(', ')}${avgValues.length > 5 ? '...' : ''}]`);
-            
+
             // Calculate overall statistics
             const absMax = maxValues.length > 0 ? Math.max(...maxValues) : null;
             const absMin = minValues.length > 0 ? Math.min(...minValues) : null;
             const overallMean = avgValues.length > 0 ? avgValues.reduce((sum, val) => sum + val, 0) / avgValues.length : null;
-            
+
             console.log(`[DEBUG]   Calculated abs_min: ${absMin} (minimum of all min values)`);
             console.log(`[DEBUG]   Calculated abs_max: ${absMax} (maximum of all max values)`);
             console.log(`[DEBUG]   Calculated mean: ${overallMean}`);
-            
+
             // OPTION 2: Average approach - Average of all min/max values
             const avgOfMaxValues = maxValues.length > 0 ? maxValues.reduce((sum, val) => sum + val, 0) / maxValues.length : null;
             const avgOfMinValues = minValues.length > 0 ? minValues.reduce((sum, val) => sum + val, 0) / minValues.length : null;
-            
+
                                  // Create month name for datetime field
                      const monthNames = [
                          'January', 'February', 'March', 'April', 'May', 'June',
                          'July', 'August', 'September', 'October', 'November', 'December'
                      ];
                      const monthName = monthNames[parseInt(monthRecord.month) - 1];
-            
+
                                  monthlyResults.push({
                          datetime: monthName,
                          measure: monthRecord.measure,
@@ -1017,7 +1018,7 @@ async function fetchHistoricalData(itemName) {
                          max_avg: avgOfMaxValues !== null ? avgOfMaxValues.toString() : null
                      });
         }
-        
+
                          // Sort monthly results by month number (1-12)
                  monthlyResults.sort((a, b) => {
                      const monthOrder = {
@@ -1039,11 +1040,11 @@ async function fetchUrbanDemand(itemName) {
     try {
         // Get dynamic date range: 5 months ago + actual month + 5 months ahead
         let now = new Date();
-        
+
         // Calculate 5 months ago
         let fiveMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 5, 1);
         fiveMonthsAgo.setHours(0, 0, 0, 0);
-        
+
         // Calculate 5 months ahead
         let fiveMonthsAhead = new Date(now.getFullYear(), now.getMonth() + 5, 1);
         fiveMonthsAhead.setHours(23, 59, 59, 999);
@@ -1052,7 +1053,7 @@ async function fetchUrbanDemand(itemName) {
         let datastream = await fetchDatastream(itemName, "CantonieraReservoir_MonthlyUrbanDemand");
         if (datastream === undefined) {
             console.log(`[ERROR] Datastream CantonieraReservoir_MonthlyUrbanDemand not found for ${itemName}`);
-            return { 
+            return {
                 "data": [{
                     "message": "No urbanDemand data found"
                 }]
@@ -1061,7 +1062,7 @@ async function fetchUrbanDemand(itemName) {
 
         // Get original units from datastream and convert to monthly units
         let originalUnits = datastream.unitOfMeasurement.name + "(" + datastream.unitOfMeasurement.symbol + ")";
-        
+
         // Since we're summing daily m³ values to get monthly totals, always show as m³/month
         let monthlyUnits = originalUnits;
         if (originalUnits.toLowerCase().includes("m³") || originalUnits.toLowerCase().includes("m3")) {
@@ -1073,11 +1074,11 @@ async function fetchUrbanDemand(itemName) {
 
         // Fetch data from the CantonieraReservoir_MonthlyUrbanDemand datastream
         let urbanDemandObservations = await fetchAllObservationsInDatastreamInRange(
-            itemName, 
-            "CantonieraReservoir_MonthlyUrbanDemand", 
-            formatDate(fiveMonthsAgo), 
-            formatDate(fiveMonthsAhead), 
-            1000, 
+            itemName,
+            "CantonieraReservoir_MonthlyUrbanDemand",
+            formatDate(fiveMonthsAgo),
+            formatDate(fiveMonthsAhead),
+            1000,
             0
         );
 
@@ -1093,7 +1094,7 @@ async function fetchUrbanDemand(itemName) {
             urbanDemandObservations.forEach((obs) => {
                 const monthKey = getMonthKey(obs.time_of_measure);
                 const value = parseFloat(obs.value);
-                
+
                 // Sum daily values to get monthly total
                 if (monthlyData.has(monthKey)) {
                     monthlyData.get(monthKey).value += value;
@@ -1113,17 +1114,17 @@ async function fetchUrbanDemand(itemName) {
             'July', 'August', 'September', 'October', 'November', 'December'
         ];
 
-        
+
         // Process each month's data
         for (const [monthKey, monthRecord] of monthlyData) {
             const monthlyUrbanDemand = monthRecord.value;
-            
+
             // Get month name for display
             const date = new Date(monthKey);
             const monthName = monthNames[date.getMonth()];
             // const year = date.getFullYear();
             // const datetime = `${monthName} ${year}`;
-            
+
             urbanDemandData.push({
                 "datetime": monthName,
                 "measure": "Monthly Urban Demand",
@@ -1156,7 +1157,7 @@ async function fetchUrbanDemand(itemName) {
         };
     } catch (error) {
         console.log(`[ERROR] Error fetching urban demand data for ${itemName}:`, error.message);
-        throw error; 
+        throw error;
     }
 }
 
@@ -1322,7 +1323,7 @@ async function fetchDatastreamInAField(fieldName, datastreamName) {
 }
 
 async function fetchDatastream(fieldName, datastreamName) {
-    
+
     let datastreamsLink = await fetchFromDatabase(baseurl + "/Things?$filter=name eq '" + fieldName + "'").then((data) => {
         if (!data) {
             console.log(`[ERROR] No data returned for fieldName: ${fieldName}`);
@@ -1764,7 +1765,7 @@ async function produceFieldThing(thing) {
 
     thing.setPropertyReadHandler("modelOutputs", async (_params, options) => {
         //http://localhost/acquaountpinos/properties/modelOutputs
-        
+
         // Check if this is a basin or field thing
         const thingType = thing.getThingDescription().thingType;
             let twoDaysAgo = new Date();
@@ -1789,7 +1790,7 @@ async function produceFieldThing(thing) {
             });
             daily_irr_deficit_observations.forEach(item => {
                 time_of_measure.add(item.time_of_measure);
-            });        
+            });
             daily_soil_m_observations.forEach(item => {
                 time_of_measure.add(item.time_of_measure);
             });
@@ -1797,7 +1798,7 @@ async function produceFieldThing(thing) {
             daily_irr_volume_values = []
             daily_irr_deficit_values = []
             daily_soil_m_values = []
-            
+
             function getLatestValueForTime(observations,time) {
                 let observations_for_the_day = observations.filter(item => item.time_of_measure == time);
                 observations_for_the_day.sort((a, b) => new Date(b.result_time) - new Date(a.result_time));
@@ -1814,7 +1815,7 @@ async function produceFieldThing(thing) {
                 daily_soil_m_values.push(getLatestValueForTime(daily_soil_m_observations, time));
             });
 
-       
+
         time_of_measure_string = time_of_measure.map(item => item.split("T")[0]);
         let irrigation_dates = await fetchFieldIrrigationDates(thing.getThingDescription().fieldName);
         let today_date = new Date();
@@ -1841,7 +1842,7 @@ async function produceFieldThing(thing) {
             ],
             "verticalLines": vertical_lines
         }
-        
+
     });
 
     thing.setActionHandler("receiveMeasure", async (_params, options) => {
@@ -1852,7 +1853,7 @@ async function produceFieldThing(thing) {
         if (!Object.keys(params['info']).includes("deviceID")) {
             return {result: false, message: 'Device ID missing in message'};
         }
-       
+
         if (!Object.keys(params).includes("values")) {
             return {result: false, message: 'Values missing in message'};
         }
@@ -1884,7 +1885,7 @@ async function produceFieldThing(thing) {
                 result: params["values"][propertyName],
                 phenomenonTime: phenomTime
             };
-            if(Object.keys(params['info']).includes("resultTime")) {    
+            if(Object.keys(params['info']).includes("resultTime")) {
                 observation_body.resultTime = params['info']['resultTime'];
             }
             if(Object.keys(params['info']).includes("parameters")) {
@@ -1977,6 +1978,8 @@ async function produceFieldThing(thing) {
 servient.start().then(async (WoT) => {
     let mainJson = readJsonFileSync('src/resources/thingDescription/main.td.json');
     let creationPath = 'src/resources/thingDescription/Fields/Custom/'
+
+    mainJson['base'] = config_baseurl;
 
     WoT.produce(mainJson).then((thing) => {
         thing.setActionHandler("createThing", async (_params, options) => {
@@ -2132,11 +2135,11 @@ servient.start().then(async (WoT) => {
                     "properties": {}
                     }
             ]
-            
+
             for (let propert of properties_data) {
                 let propertyId = await createPropertyInST(propert);
 
-                let datastream_data = {                    
+                let datastream_data = {
                     "name": fieldFinalName + "_" + propert["name"].replaceAll(" ", ""),
                     "description": propert["description"],
                     "observationType": "Measurement",
@@ -2184,10 +2187,10 @@ servient.start().then(async (WoT) => {
                     });
                 }
             });
-            
-            
+
+
             return {status: true, message: 'Things listed successfully', things: thingsList};
-            
+
         });
         thing.expose().then(() => {
             console.info(`${thing.getThingDescription().title} ready`);
@@ -2226,6 +2229,8 @@ servient.start().then(async (WoT) => {
             jsonBase[key] = jsonSpecific[key];
         }
 
+        jsonBase['base'] = config_baseurl;
+
         WoT.produce(jsonBase).then((thing) => {
             produceFieldThing(thing);
         }).catch((e) => {
@@ -2257,15 +2262,17 @@ servient.start().then(async (WoT) => {
             jsonBase[key] = jsonSpecific[key];
         }
 
+        jsonBase['base'] = config_baseurl;
+
         WoT.produce(jsonBase).then((thing) => {
             thing.setPropertyReadHandler("fieldInformation", async () => {
                 return await fetchFieldInformation(thing.getThingDescription().itemName);
             });
-                        
+
             thing.setPropertyReadHandler("modelOutputs", async (_params, options) => {
                 return await fetchBasinInformation(thing.getThingDescription().itemName);
                 // return {result: true, message: 'Model outputs not yet implemented'};
-            }); 
+            });
 
             thing.setPropertyReadHandler("urbanDemand", async (_params, options) => {
                 return await fetchUrbanDemand(thing.getThingDescription().itemName);
@@ -2426,7 +2433,7 @@ servient.start().then(async (WoT) => {
                 if (!Object.keys(params['info']).includes("deviceID")) {
                     return {result: false, message: 'Device ID missing in message'};
                 }
-                
+
                 if (!Object.keys(params).includes("values")) {
                     return {result: false, message: 'Values missing in message'};
                 }
@@ -2457,9 +2464,9 @@ servient.start().then(async (WoT) => {
                     let observation_body = {
                         result: params["values"][propertyName],
                         phenomenonTime: phenomTime
-                        
+
                     };
-                    if(Object.keys(params['info']).includes("resultTime")) {    
+                    if(Object.keys(params['info']).includes("resultTime")) {
                         observation_body.resultTime = params['info']['resultTime'];
                     }
                     if(Object.keys(params['info']).includes("parameters")) {
@@ -2473,7 +2480,7 @@ servient.start().then(async (WoT) => {
                     thing.emitEvent("newObservation", {
                         deviceID: sensorName,
                         observedProperty: propertyName,
-                        value: observation_body.result, 
+                        value: observation_body.result,
                         time: observation_body.phenomenonTime
                     });
                 }
@@ -2548,6 +2555,8 @@ servient.start().then(async (WoT) => {
         for (const key in jsonSpecific) {
             jsonBase[key] = jsonSpecific[key];
         }
+
+        jsonBase['base'] = config_baseurl;
 
         WoT.produce(jsonBase).then((thing) => {
             thing.setPropertyReadHandler("stationInformation", async () => {
@@ -2686,7 +2695,7 @@ servient.start().then(async (WoT) => {
                 }
                 if (!Object.keys(params['info']).includes("deviceID")) {
                     return {result: false, message: 'Device ID missing in message'};
-                }                
+                }
                 if (!Object.keys(params).includes("values")) {
                     return {result: false, message: 'Values missing in message'};
                 }
@@ -2714,12 +2723,12 @@ servient.start().then(async (WoT) => {
                     } else {
                         phenomTime = formatDate(new Date());
                     }
-    
+
                     let observation_body = {
                         result: params["values"][propertyName],
                         phenomenonTime: phenomTime
                     };
-                    if(Object.keys(params['info']).includes("resultTime")) {    
+                    if(Object.keys(params['info']).includes("resultTime")) {
                         observation_body.resultTime = params['info']['resultTime'];
                     }
                     if(Object.keys(params['info']).includes("parameters")) {

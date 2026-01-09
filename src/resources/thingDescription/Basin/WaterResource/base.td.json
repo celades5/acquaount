@@ -4,7 +4,6 @@
   "title": "AcquaountThingBase",
   "thingType": "BasinWaterResource",
   "itemName": "Base",
-  "base": "http://84.88.76.18",
   "securityDefinitions": {
     "basic_sc": {
       "scheme": "nosec"
