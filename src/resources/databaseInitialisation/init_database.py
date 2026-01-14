@@ -15,6 +15,10 @@ if __name__ in "__main__":
     if len(sys.argv) < 2:
         print("Filename missing")
         sys.exit(-2)
+    if len(sys.argv) < 3:
+        print("Url missing, using default")
+    else:
+        baseurl = sys.argv[2]
     with open(sys.argv[1], "r", errors="ignore") as f:
         reader = csv.DictReader(f, delimiter=";")
         for row in reader:
@@ -59,7 +63,10 @@ if __name__ in "__main__":
                 print(response.status_code)
             else:
                 things_req = r.get(
-                    location_json["value"][0]["Things@iot.navigationLink"].replace("localhost", "84.88.76.18/wotst").replace("http", "https"), verify=False)
+                    location_json["value"][0]["Things@iot.navigationLink"].replace("localhost",
+                                                                                   "84.88.76.18/wotst").replace("http",
+                                                                                                                "https"),
+                    verify=False)
                 for thing in things_req.json()["value"]:
                     if int(thing["@iot.id"]) == thing_id:
                         break
@@ -140,7 +147,8 @@ if __name__ in "__main__":
             # Aggregates
             if row['Averages'] == 'Weekly':
                 average_datastream_name = "AVG_WEEKLY_" + row['Datastream Name']
-                datastream_res = r.get(f"{baseurl}/Datastreams?$filter=name eq '{average_datastream_name}'", verify=False)
+                datastream_res = r.get(f"{baseurl}/Datastreams?$filter=name eq '{average_datastream_name}'",
+                                       verify=False)
                 if datastream_res.status_code != 200:
                     print("Error in request")
                     # sys.exit(-1)

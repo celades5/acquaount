@@ -2,16 +2,41 @@
 ## Prerequisites
 Docker and Docker Compose are required in order to run WoT-Server. Running the Compose project will automatically create an environment in which all necessary installations will be performed.
 
-To run/deploy:
+## Getting Started
+Before deploying the server, the Things must be created. Even though creating them while the deployed server is possible, creating them beforehand is cleaner and faster.  
+
+To create new Things that will be deployed once the server is started, the user must navigate to the _src/resources/thingDescription_ folder and create as many Things as desired. To create a Thing, simply copy any of the provided Thing descriptions and change the id, title, name, and description. The name attribute can be fieldName, stationName, or itemName, depending on the Thing Type. It is important that each Thing is placed in its correct folder and that the filename ends in "_.td.json_".  
+
+Once things are defined, the WoT-Server can be deployed. To run/deploy:
 >docker compose up --build -d
 
 This will deploy the main server and its dependencies: The SensorThings server, the PostGIS database, and a service to fetch data from external platforms.  
 The default exposed ports for this deployment are:
- + WoT-Server: Port 2080
- + SensorThings Server: Ports 8008 and 1883
-  
-These ports can be changed in the docker-compose.yml file.
++ WoT-Server: Port 2080
++ SensorThings Server: Ports 8008 and 1883
 
+These ports can be changed in the docker-compose.yml file.  
+
+After deploying the server, the datastreams must be created. They can be created using the examples provided in the Postman collection at the end of this document or the Python script _init_database.py_ available in the _src/resources/databaseInitialisation_ folder. To define the datastreams, CSV files are used. There are many examples in the same folder, the following list explains all the columns found in these CSV files. Columns in **bold** indicate the data is mandatory for the datastream to be created and must be unique between different instances. Other columns are optional.
++ Placeholder: Empty column created to avoid decrypting errors at the beginning of some rows.
++ Pilot: The pilot test location of this datastream.
++ **Field Name**: The name of the field where this datastream will be observed.
++ Field Description: A description of the field.
++ Field Longitude and Field Latitude: The location of the field.
++ **Device ID**: The name of the sensor used to observe the datastream.
++ Device Description: A description of the sensor used.
++ Device Type: A short string used to identify the make and model of the sensor.
++ Device EUI: A number to identify the sensor.
++ **Property Name**: The name of the property observed in the datastream.
++ Property Description: A description of the property.
++ Unit Of Measurement and Unit Of Measurement Symbol: Name and symbol of the unit of measurement of the data in the datastream.
++ **Datastream Name**: The datastream name. In the examples it's generated automatically as \<Field Name\>\_\<Device ID\>\_\<Property Name\> and replacing the spaces for underscores but this naming convention is not enforced.
++ Datastream Description: A description of the datastream. Like with the name, it's generated automatically, but it's not mandatory to follow the same structure.
+
+The script will handle the creation of all types of instances, extracted from the rows of data, while making sure to not create duplicates. To run the script, navigate to the directory and run the following command:
+>python3 init_database.py \<csv_file.csv\> \[\<SensorThings Server URL\>\]  
+
+This script can be run as many times as necessary, and it will check for duplicates every time. It is not necessary to run every time the WoT-Server is redeployed, since data is stored in a volume and persisted between sessions.  
 
 ## Statement Of Need
 WoT-Server was created as a centralised data management solution for the ACQUAOUNT Project. One of the objectives of the ACQUAOUNT Project is providing smart irrigation recommendations to farmers using a water balance model. This model takes as input timeseries data of different properties of the specified field, such as temperature, soil moisture and wind speed, and calculates the best date and amount of irrigation. WoT-Server was developed as a standardized API to allow easy access to faming/water management data for further model implementation and to simplify the upload, storage and retrieval procedures of measurements from sensors in the field. WoT-Server is capable of both receiving data via an HTTP endpoint or fetching the data itself from other API services, a feature useful for centralising data from multiple platforms.  
@@ -46,7 +71,7 @@ Finally, all types of Things have the same event affordance, which can be subscr
 
 The Binding Templates defined inside the thing descriptions describe how to interact with the interaction affordances. For properties, they can be read using a GET request and request parameters, for actions, they can be invoked using a POST request and request body, and special clients can subscribe to events with a special handshake.  
 
-## Postman Collection
+## Testing And Verification
 
-The following [Postman collection](https://www.postman.com/orange-comet-247459/workspace/wot-server-example-endpoints/collection/18279882-309079ec-7ba2-4c14-9d69-3f89b1fe321c?action=share&creator=18279882&active-environment=18279882-52d6afdd-3ec1-40b0-976d-2115edbda08d) contains examples on how to interact with WoT-Server.
+WoT-Server does not have automated tests, the following [Postman collection](https://www.postman.com/orange-comet-247459/workspace/wot-server-example-endpoints/collection/18279882-309079ec-7ba2-4c14-9d69-3f89b1fe321c?action=share&creator=18279882&active-environment=18279882-52d6afdd-3ec1-40b0-976d-2115edbda08d) can be used to test functionality. The collection contains example HTTP requests for how to interact with WoT-Server and also examples of successful HTTP responses so they can be compared with individual results. 
 

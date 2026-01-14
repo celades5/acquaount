@@ -141,12 +141,10 @@ function fetchFromDatabase(database_url) {
 async function fetchAllPagesFromDatabase(database_url) {
     return fetch(formatUrl(database_url)).then(async function (response) {
         if (response.ok) {
-            let body= await response.json();
-            if("value" in body && "@iot.nextLink" in body && body["@iot.nextLink"] !== null)
-            {
+            let body = await response.json();
+            if ("value" in body && "@iot.nextLink" in body && body["@iot.nextLink"] !== null) {
                 let nextLink = body["@iot.nextLink"];
-                while(nextLink !== null)
-                {
+                while (nextLink !== null) {
 
                     nextLink = nextLink.replace("http://localhost:8008/FROST-Server/v1.1", baseurl);
                     let nextBody = await fetch(nextLink).then(function (response) {
@@ -156,11 +154,9 @@ async function fetchAllPagesFromDatabase(database_url) {
                         return {}
                     });
                     body["value"].push(...nextBody["value"]);
-                    if("@iot.nextLink" in nextBody)
-                    {
+                    if ("@iot.nextLink" in nextBody) {
                         nextLink = nextBody["@iot.nextLink"];
-                    }else
-                    {
+                    } else {
                         nextLink = null;
                     }
 
@@ -189,24 +185,23 @@ function postToDatabase(database_url, data) {
     return fetch(formatUrl(database_url), options).then(function (response) {
         if (response.ok) {
             return true;
-        }else
-        {
-        // Print the error code and message from the response
-        response.text().then(text => {
-            try {
-                const errorJson = JSON.parse(text);
-                console.log("Failed to post to database ", database_url, " data: ", data);
-                if (errorJson && errorJson.error) {
-                    console.log("Error code:", errorJson.error.code);
-                    console.log("Error message:", errorJson.error.message);
-                } else {
-                    console.log("Error response:", errorJson);
+        } else {
+            // Print the error code and message from the response
+            response.text().then(text => {
+                try {
+                    const errorJson = JSON.parse(text);
+                    console.log("Failed to post to database ", database_url, " data: ", data);
+                    if (errorJson && errorJson.error) {
+                        console.log("Error code:", errorJson.error.code);
+                        console.log("Error message:", errorJson.error.message);
+                    } else {
+                        console.log("Error response:", errorJson);
+                    }
+                } catch (e) {
+                    console.log("Error response (not JSON):", text);
                 }
-            } catch (e) {
-                console.log("Error response (not JSON):", text);
-            }
-            throw new Error('Request failed');
-        });
+                throw new Error('Request failed');
+            });
         }
 
 
@@ -305,20 +300,20 @@ function getSixMonthsBefore(dateString) {
     return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}Z`;
 }
 
-async function setThingLocation(thingId, latitude, longitude){
+async function setThingLocation(thingId, latitude, longitude) {
     location_body = {
         "name": "Default",
         "description": "This is the default location",
         "properties": {},
         "encodingType": "application/geo+json",
         "location": {
-          "type": "Point",
-          "coordinates": [latitude, longitude]
+            "type": "Point",
+            "coordinates": [latitude, longitude]
         },
         "Things": [
-          { "@iot.id": thingId}
+            {"@iot.id": thingId}
         ]
-      }
+    }
     postToDatabase(baseurl + "/Locations", location_body).then((data) => {
         return data;
     });
@@ -359,19 +354,19 @@ async function fetchBasinInformation(itemName) {
 
         // Fetch basin measurements using platform's 9 datastreams
         // Inflow data
-        let minInflow_observations = await fetchAllObservationsInDatastreamInRange(itemName, datastreamPrefix + "_MonthlyMinInflow",  formatDate(now),"", 1000, 0);
-        let maxInflow_observations = await fetchAllObservationsInDatastreamInRange(itemName, datastreamPrefix + "_MonthlyMaxInflow", formatDate(now),"", 1000, 0);
-        let meanInflow_observations = await fetchAllObservationsInDatastreamInRange(itemName, datastreamPrefix + "_MonthlyMeanInflow", formatDate(now),"", 1000, 0);
+        let minInflow_observations = await fetchAllObservationsInDatastreamInRange(itemName, datastreamPrefix + "_MonthlyMinInflow", formatDate(now), "", 1000, 0);
+        let maxInflow_observations = await fetchAllObservationsInDatastreamInRange(itemName, datastreamPrefix + "_MonthlyMaxInflow", formatDate(now), "", 1000, 0);
+        let meanInflow_observations = await fetchAllObservationsInDatastreamInRange(itemName, datastreamPrefix + "_MonthlyMeanInflow", formatDate(now), "", 1000, 0);
 
         // Outflow/Demand data
-        let minOutflow_observations = await fetchAllObservationsInDatastreamInRange(itemName, datastreamPrefix + "_MonthlyMinIrrigationDemand",  formatDate(now),"", 1000, 0);
-        let maxOutflow_observations = await fetchAllObservationsInDatastreamInRange(itemName, datastreamPrefix + "_MonthlyMaxIrrigationDemand",  formatDate(now),"", 1000, 0);
-        let meanOutflow_observations = await fetchAllObservationsInDatastreamInRange(itemName, datastreamPrefix + "_MonthlyMeanIrrigationDemand", formatDate(now),"", 1000, 0);
+        let minOutflow_observations = await fetchAllObservationsInDatastreamInRange(itemName, datastreamPrefix + "_MonthlyMinIrrigationDemand", formatDate(now), "", 1000, 0);
+        let maxOutflow_observations = await fetchAllObservationsInDatastreamInRange(itemName, datastreamPrefix + "_MonthlyMaxIrrigationDemand", formatDate(now), "", 1000, 0);
+        let meanOutflow_observations = await fetchAllObservationsInDatastreamInRange(itemName, datastreamPrefix + "_MonthlyMeanIrrigationDemand", formatDate(now), "", 1000, 0);
 
         // Storage/Volume data
-        let minStorage_observations = await fetchAllObservationsInDatastreamInRange(itemName, datastreamPrefix + "_MonthlyMinProjectedVolume", formatDate(now),"", 1000, 0);
-        let maxStorage_observations = await fetchAllObservationsInDatastreamInRange(itemName, datastreamPrefix + "_MonthlyMaxProjectedVolume",  formatDate(now),"", 1000, 0);
-        let meanStorage_observations =await fetchAllObservationsInDatastreamInRange(itemName, datastreamPrefix + "_MonthlyMeanProjectedVolume", formatDate(now),"", 1000, 0);
+        let minStorage_observations = await fetchAllObservationsInDatastreamInRange(itemName, datastreamPrefix + "_MonthlyMinProjectedVolume", formatDate(now), "", 1000, 0);
+        let maxStorage_observations = await fetchAllObservationsInDatastreamInRange(itemName, datastreamPrefix + "_MonthlyMaxProjectedVolume", formatDate(now), "", 1000, 0);
+        let meanStorage_observations = await fetchAllObservationsInDatastreamInRange(itemName, datastreamPrefix + "_MonthlyMeanProjectedVolume", formatDate(now), "", 1000, 0);
 
         // Fetch ENAS weekly storage data for September (lowest month)
         // Note: The datastream AVG_WEEKLY_ENAS_10329_Water_Storage_m3 is inside the Cantoniera Reservoir item
@@ -380,7 +375,7 @@ async function fetchBasinInformation(itemName) {
 
         let enasWeeklyStorage_observations;
         try {
-            enasWeeklyStorage_observations = await fetchAllObservationsInDatastreamInRange(itemName, "AVG_WEEKLY_ENAS_10329_Water_Storage_m3", formatDate(now),"", 1000, 0);
+            enasWeeklyStorage_observations = await fetchAllObservationsInDatastreamInRange(itemName, "AVG_WEEKLY_ENAS_10329_Water_Storage_m3", formatDate(now), "", 1000, 0);
             console.log(`[DEBUG] ENAS fetch result:`, enasWeeklyStorage_observations);
         } catch (error) {
             console.log(`[ERROR] Failed to fetch ENAS data:`, error.message);
@@ -434,7 +429,7 @@ async function fetchBasinInformation(itemName) {
             }
         }
 
-        if(minInflow_observations === undefined || maxInflow_observations === undefined || meanInflow_observations === undefined || minOutflow_observations === undefined || maxOutflow_observations === undefined || meanOutflow_observations === undefined || minStorage_observations === undefined || maxStorage_observations === undefined || meanStorage_observations === undefined) {
+        if (minInflow_observations === undefined || maxInflow_observations === undefined || meanInflow_observations === undefined || minOutflow_observations === undefined || maxOutflow_observations === undefined || meanOutflow_observations === undefined || minStorage_observations === undefined || maxStorage_observations === undefined || meanStorage_observations === undefined) {
             return {
                 "result": false,
                 "data": [],
@@ -770,196 +765,196 @@ async function fetchHistoricalData(itemName) {
                     continue;
                 }
 
-                    // Process each row in the sheet
-                    sheet.forEach((row, index) => {
-                        // Skip header rows (rows without month data)
-                        if (!row || !row[monthColumnName]) {
-                            return;
+                // Process each row in the sheet
+                sheet.forEach((row, index) => {
+                    // Skip header rows (rows without month data)
+                    if (!row || !row[monthColumnName]) {
+                        return;
+                    }
+
+                    // Extract month-year from the month column
+                    const monthYear = row[monthColumnName];
+                    if (!monthYear) return;
+
+
+                    // Determine unit based on file type and sheet name
+                    let determinedUnit = '';
+
+                    // Try different possible column name patterns based on Excel structure
+                    let maxValue, minValue, avgValue;
+
+                    const typeCapitalized = fileConfig.type.charAt(0).toUpperCase() + fileConfig.type.slice(1);
+
+                    // Define all possible patterns
+                    const patterns = [
+                        // Volume patterns
+                        {type: typeCapitalized, unit: 'Mmc', format: `[Mmc]`},
+                        {type: typeCapitalized, unit: 'Mmc', format: `(Mmc)`},
+                        // Outflow patterns (m3/s)
+                        {type: typeCapitalized, unit: 'm3/s', format: `[m3/s]`},
+                        // Inflow patterns (mc/s)
+                        {type: typeCapitalized, unit: 'mc/s', format: `[mc/s]`}
+                    ];
+
+                    // Iterate through patterns to find a match
+                    for (const pattern of patterns) {
+                        const maxCandidateKey = `Max of ${pattern.type} ${pattern.format}`;
+                        const minCandidateKey = `Min of ${pattern.type} ${pattern.format}`;
+                        const avgCandidateKey = `Average of ${pattern.type} ${pattern.format}`;
+
+                        if (row[maxCandidateKey] !== undefined && row[minCandidateKey] !== undefined && row[avgCandidateKey] !== undefined) {
+                            maxValue = row[maxCandidateKey];
+                            minValue = row[minCandidateKey];
+                            avgValue = row[avgCandidateKey];
+                            determinedUnit = pattern.unit;
+                            break; // Found a match, exit loop
                         }
+                    }
 
-                        // Extract month-year from the month column
-                        const monthYear = row[monthColumnName];
-                        if (!monthYear) return;
+                    // If no values found with specific patterns, try fallback for volume data
+                    if (!maxValue && !minValue && !avgValue) {
+                        const allKeys = Object.keys(row);
+                        const matchingKeys = allKeys.filter(key => key.toLowerCase().includes(fileConfig.type.toLowerCase()));
 
-
-                        // Determine unit based on file type and sheet name
-                        let determinedUnit = '';
-
-                        // Try different possible column name patterns based on Excel structure
-                        let maxValue, minValue, avgValue;
-
-                        const typeCapitalized = fileConfig.type.charAt(0).toUpperCase() + fileConfig.type.slice(1);
-
-                        // Define all possible patterns
-                        const patterns = [
-                            // Volume patterns
-                            { type: typeCapitalized, unit: 'Mmc', format: `[Mmc]` },
-                            { type: typeCapitalized, unit: 'Mmc', format: `(Mmc)` },
-                            // Outflow patterns (m3/s)
-                            { type: typeCapitalized, unit: 'm3/s', format: `[m3/s]` },
-                            // Inflow patterns (mc/s)
-                            { type: typeCapitalized, unit: 'mc/s', format: `[mc/s]` }
-                        ];
-
-                        // Iterate through patterns to find a match
-                        for (const pattern of patterns) {
-                            const maxCandidateKey = `Max of ${pattern.type} ${pattern.format}`;
-                            const minCandidateKey = `Min of ${pattern.type} ${pattern.format}`;
-                            const avgCandidateKey = `Average of ${pattern.type} ${pattern.format}`;
-
-                            if (row[maxCandidateKey] !== undefined && row[minCandidateKey] !== undefined && row[avgCandidateKey] !== undefined) {
-                                maxValue = row[maxCandidateKey];
-                                minValue = row[minCandidateKey];
-                                avgValue = row[avgCandidateKey];
-                                determinedUnit = pattern.unit;
-                                break; // Found a match, exit loop
-                            }
-                        }
-
-                        // If no values found with specific patterns, try fallback for volume data
-                        if (!maxValue && !minValue && !avgValue) {
-                            const allKeys = Object.keys(row);
-                            const matchingKeys = allKeys.filter(key => key.toLowerCase().includes(fileConfig.type.toLowerCase()));
-
-                            // Try to find max/min/avg in these columns
-                            matchingKeys.forEach(key => {
-                                if (key.toLowerCase().includes('max') && !maxValue) {
-                                    maxValue = row[key];
-                                    // Attempt to extract unit from the matched key
-                                    const unitMatch = key.match(/\[(.*?)\]|\((.*?)\)/);
-                                    if (unitMatch && (unitMatch[1] || unitMatch[2])) {
-                                        determinedUnit = unitMatch[1] || unitMatch[2];
-                                    }
+                        // Try to find max/min/avg in these columns
+                        matchingKeys.forEach(key => {
+                            if (key.toLowerCase().includes('max') && !maxValue) {
+                                maxValue = row[key];
+                                // Attempt to extract unit from the matched key
+                                const unitMatch = key.match(/\[(.*?)\]|\((.*?)\)/);
+                                if (unitMatch && (unitMatch[1] || unitMatch[2])) {
+                                    determinedUnit = unitMatch[1] || unitMatch[2];
                                 }
-                                if (key.toLowerCase().includes('min') && !minValue) {
-                                    minValue = row[key];
-                                    const unitMatch = key.match(/\[(.*?)\]|\((.*?)\)/);
-                                    if (unitMatch && (unitMatch[1] || unitMatch[2]) && !determinedUnit) {
-                                        determinedUnit = unitMatch[1] || unitMatch[2];
-                                    }
+                            }
+                            if (key.toLowerCase().includes('min') && !minValue) {
+                                minValue = row[key];
+                                const unitMatch = key.match(/\[(.*?)\]|\((.*?)\)/);
+                                if (unitMatch && (unitMatch[1] || unitMatch[2]) && !determinedUnit) {
+                                    determinedUnit = unitMatch[1] || unitMatch[2];
                                 }
-                                if ((key.toLowerCase().includes('average') || key.toLowerCase().includes('avg')) && !avgValue) {
-                                    avgValue = row[key];
-                                    const unitMatch = key.match(/\[(.*?)\]|\((.*?)\)/);
-                                    if (unitMatch && (unitMatch[1] || unitMatch[2]) && !determinedUnit) {
-                                        determinedUnit = unitMatch[1] || unitMatch[2];
-                                    }
+                            }
+                            if ((key.toLowerCase().includes('average') || key.toLowerCase().includes('avg')) && !avgValue) {
+                                avgValue = row[key];
+                                const unitMatch = key.match(/\[(.*?)\]|\((.*?)\)/);
+                                if (unitMatch && (unitMatch[1] || unitMatch[2]) && !determinedUnit) {
+                                    determinedUnit = unitMatch[1] || unitMatch[2];
                                 }
-                            });
+                            }
+                        });
+                    }
+
+                    // If unit is still not determined, use a default based on file type
+                    if (!determinedUnit) {
+                        if (fileConfig.type === 'volume') {
+                            determinedUnit = 'Mmc';
+                        } else if (fileConfig.type === 'outflow') {
+                            determinedUnit = 'm3/s';
+                        } else if (fileConfig.type === 'inflow') {
+                            determinedUnit = 'mc/s';
+                        }
+                    }
+
+                    // Convert month-year to datetime (handling Excel serial numbers)
+                    let datetime;
+                    let monthKey;
+                    try {
+                        // Check if monthYear is a number (Excel serial date)
+                        if (typeof monthYear === 'number') {
+                            // Convert Excel serial number to JavaScript Date
+                            // Excel dates are days since 1900-01-01, but Excel incorrectly treats 1900 as leap year
+                            const excelEpoch = new Date(1900, 0, 1);
+                            const date = new Date(excelEpoch.getTime() + (monthYear - 2) * 24 * 60 * 60 * 1000);
+                            datetime = date.toISOString();
+                            // For outflow/inflow, create month key (year not relevant)
+                            monthKey = `${date.getMonth() + 1}`; // 1-12
+                        } else {
+                            // Handle string format like "Jan-2023"
+                            const [month, year] = monthYear.split('-');
+                            const monthMap = {
+                                'Jan': 0, 'Feb': 1, 'Mar': 2, 'Apr': 3, 'May': 4, 'Jun': 5,
+                                'Jul': 6, 'Aug': 7, 'Sep': 8, 'Oct': 9, 'Nov': 10, 'Dec': 11
+                            };
+                            const monthIndex = monthMap[month];
+                            datetime = new Date(parseInt(year), monthIndex, 1).toISOString();
+                            // For outflow/inflow, create month key (year not relevant)
+                            monthKey = `${monthIndex + 1}`; // 1-12
+                        }
+                    } catch (e) {
+                        return; // Skip this row if date parsing fails
+                    }
+
+                    // Group by month and collect all values for statistics
+                    const monthDataKey = `${monthKey}_${fileConfig.type}_${determinedUnit}`;
+
+                    if (!monthlyData.has(monthDataKey)) {
+                        monthlyData.set(monthDataKey, {
+                            month: monthKey,
+                            measure: fileConfig.type,
+                            unit: determinedUnit,
+                            values: []
+                        });
+                    }
+
+                    const monthRecord = monthlyData.get(monthDataKey);
+
+                    // Helper function to validate and parse values - filters out 0, empty cells, and NaN
+                    const isValidValue = (value, valueType, monthYear) => {
+                        // Check for undefined, null, or empty string
+                        if (value === undefined || value === null || value === '') {
+                            console.log(`[DEBUG] Skipping ${valueType} value for ${monthYear}: empty cell (${value})`);
+                            return null;
                         }
 
-                        // If unit is still not determined, use a default based on file type
-                        if (!determinedUnit) {
-                            if (fileConfig.type === 'volume') {
-                                determinedUnit = 'Mmc';
-                            } else if (fileConfig.type === 'outflow') {
-                                determinedUnit = 'm3/s';
-                            } else if (fileConfig.type === 'inflow') {
-                                determinedUnit = 'mc/s';
-                            }
+                        // Check if it's already NaN before parsing
+                        if (typeof value === 'number' && isNaN(value)) {
+                            console.log(`[DEBUG] Skipping ${valueType} value for ${monthYear}: NaN`);
+                            return null;
                         }
 
-                        // Convert month-year to datetime (handling Excel serial numbers)
-                        let datetime;
-                        let monthKey;
-                        try {
-                            // Check if monthYear is a number (Excel serial date)
-                            if (typeof monthYear === 'number') {
-                                // Convert Excel serial number to JavaScript Date
-                                // Excel dates are days since 1900-01-01, but Excel incorrectly treats 1900 as leap year
-                                const excelEpoch = new Date(1900, 0, 1);
-                                const date = new Date(excelEpoch.getTime() + (monthYear - 2) * 24 * 60 * 60 * 1000);
-                                datetime = date.toISOString();
-                                // For outflow/inflow, create month key (year not relevant)
-                                monthKey = `${date.getMonth() + 1}`; // 1-12
-                            } else {
-                                // Handle string format like "Jan-2023"
-                                const [month, year] = monthYear.split('-');
-                                const monthMap = {
-                                    'Jan': 0, 'Feb': 1, 'Mar': 2, 'Apr': 3, 'May': 4, 'Jun': 5,
-                                    'Jul': 6, 'Aug': 7, 'Sep': 8, 'Oct': 9, 'Nov': 10, 'Dec': 11
-                                };
-                                const monthIndex = monthMap[month];
-                                datetime = new Date(parseInt(year), monthIndex, 1).toISOString();
-                                // For outflow/inflow, create month key (year not relevant)
-                                monthKey = `${monthIndex + 1}`; // 1-12
-                            }
-                        } catch (e) {
-                            return; // Skip this row if date parsing fails
+                        // Parse the value
+                        const parsedValue = parseFloat(value);
+
+                        // Check if parsing resulted in NaN
+                        if (isNaN(parsedValue)) {
+                            console.log(`[DEBUG] Skipping ${valueType} value for ${monthYear}: parsed as NaN (${value})`);
+                            return null;
                         }
 
-                        // Group by month and collect all values for statistics
-                        const monthDataKey = `${monthKey}_${fileConfig.type}_${determinedUnit}`;
-
-                        if (!monthlyData.has(monthDataKey)) {
-                            monthlyData.set(monthDataKey, {
-                                month: monthKey,
-                                measure: fileConfig.type,
-                                unit: determinedUnit,
-                                values: []
-                            });
+                        // Check if value is exactly 0 (likely empty cell artifact)
+                        if (parsedValue === 0) {
+                            console.log(`[DEBUG] Skipping ${valueType} value for ${monthYear}: exactly 0 (likely empty cell)`);
+                            return null;
                         }
 
-                        const monthRecord = monthlyData.get(monthDataKey);
-
-                        // Helper function to validate and parse values - filters out 0, empty cells, and NaN
-                        const isValidValue = (value, valueType, monthYear) => {
-                            // Check for undefined, null, or empty string
-                            if (value === undefined || value === null || value === '') {
-                                console.log(`[DEBUG] Skipping ${valueType} value for ${monthYear}: empty cell (${value})`);
-                                return null;
-                            }
-
-                            // Check if it's already NaN before parsing
-                            if (typeof value === 'number' && isNaN(value)) {
-                                console.log(`[DEBUG] Skipping ${valueType} value for ${monthYear}: NaN`);
-                                return null;
-                            }
-
-                            // Parse the value
-                            const parsedValue = parseFloat(value);
-
-                            // Check if parsing resulted in NaN
-                            if (isNaN(parsedValue)) {
-                                console.log(`[DEBUG] Skipping ${valueType} value for ${monthYear}: parsed as NaN (${value})`);
-                                return null;
-                            }
-
-                            // Check if value is exactly 0 (likely empty cell artifact)
-                            if (parsedValue === 0) {
-                                console.log(`[DEBUG] Skipping ${valueType} value for ${monthYear}: exactly 0 (likely empty cell)`);
-                                return null;
-                            }
-
-                            // Also check for Infinity values (shouldn't happen but good to filter)
-                            if (!isFinite(parsedValue)) {
-                                console.log(`[DEBUG] Skipping ${valueType} value for ${monthYear}: Infinity (${value})`);
-                                return null;
-                            }
-
-                            // Valid value
-                            return parsedValue;
-                        };
-
-                        // Process max value
-                        const validMax = isValidValue(maxValue, 'max', monthYear);
-                        if (validMax !== null) {
-                            monthRecord.values.push({ type: 'max', value: validMax });
+                        // Also check for Infinity values (shouldn't happen but good to filter)
+                        if (!isFinite(parsedValue)) {
+                            console.log(`[DEBUG] Skipping ${valueType} value for ${monthYear}: Infinity (${value})`);
+                            return null;
                         }
 
-                        // Process min value
-                        const validMin = isValidValue(minValue, 'min', monthYear);
-                        if (validMin !== null) {
-                            monthRecord.values.push({ type: 'min', value: validMin });
-                        }
+                        // Valid value
+                        return parsedValue;
+                    };
 
-                        // Process avg value
-                        const validAvg = isValidValue(avgValue, 'avg', monthYear);
-                        if (validAvg !== null) {
-                            monthRecord.values.push({ type: 'avg', value: validAvg });
-                        }
+                    // Process max value
+                    const validMax = isValidValue(maxValue, 'max', monthYear);
+                    if (validMax !== null) {
+                        monthRecord.values.push({type: 'max', value: validMax});
+                    }
 
-                    });
+                    // Process min value
+                    const validMin = isValidValue(minValue, 'min', monthYear);
+                    if (validMin !== null) {
+                        monthRecord.values.push({type: 'min', value: validMin});
+                    }
+
+                    // Process avg value
+                    const validAvg = isValidValue(avgValue, 'avg', monthYear);
+                    if (validAvg !== null) {
+                        monthRecord.values.push({type: 'avg', value: validAvg});
+                    }
+
+                });
 
             } catch (fileError) {
                 // Continue with other files
@@ -998,41 +993,41 @@ async function fetchHistoricalData(itemName) {
             const avgOfMaxValues = maxValues.length > 0 ? maxValues.reduce((sum, val) => sum + val, 0) / maxValues.length : null;
             const avgOfMinValues = minValues.length > 0 ? minValues.reduce((sum, val) => sum + val, 0) / minValues.length : null;
 
-                                 // Create month name for datetime field
-                     const monthNames = [
-                         'January', 'February', 'March', 'April', 'May', 'June',
-                         'July', 'August', 'September', 'October', 'November', 'December'
-                     ];
-                     const monthName = monthNames[parseInt(monthRecord.month) - 1];
+            // Create month name for datetime field
+            const monthNames = [
+                'January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'
+            ];
+            const monthName = monthNames[parseInt(monthRecord.month) - 1];
 
-                                 monthlyResults.push({
-                         datetime: monthName,
-                         measure: monthRecord.measure,
-                         unit: monthRecord.unit,
-                         // OPTION 1: Current approach (Math.min/Math.max)
-                         abs_min: absMin !== null ? absMin.toString() : null,
-                         abs_max: absMax !== null ? absMax.toString() : null,
-                         mean: overallMean !== null ? overallMean.toString() : null,
-                         // OPTION 2: Average approach
-                         min_avg: avgOfMinValues !== null ? avgOfMinValues.toString() : null,
-                         max_avg: avgOfMaxValues !== null ? avgOfMaxValues.toString() : null
-                     });
+            monthlyResults.push({
+                datetime: monthName,
+                measure: monthRecord.measure,
+                unit: monthRecord.unit,
+                // OPTION 1: Current approach (Math.min/Math.max)
+                abs_min: absMin !== null ? absMin.toString() : null,
+                abs_max: absMax !== null ? absMax.toString() : null,
+                mean: overallMean !== null ? overallMean.toString() : null,
+                // OPTION 2: Average approach
+                min_avg: avgOfMinValues !== null ? avgOfMinValues.toString() : null,
+                max_avg: avgOfMaxValues !== null ? avgOfMaxValues.toString() : null
+            });
         }
 
-                         // Sort monthly results by month number (1-12)
-                 monthlyResults.sort((a, b) => {
-                     const monthOrder = {
-                         'January': 1, 'February': 2, 'March': 3, 'April': 4, 'May': 5, 'June': 6,
-                         'July': 7, 'August': 8, 'September': 9, 'October': 10, 'November': 11, 'December': 12
-                     };
-                     return monthOrder[a.datetime] - monthOrder[b.datetime];
-                 });
+        // Sort monthly results by month number (1-12)
+        monthlyResults.sort((a, b) => {
+            const monthOrder = {
+                'January': 1, 'February': 2, 'March': 3, 'April': 4, 'May': 5, 'June': 6,
+                'July': 7, 'August': 8, 'September': 9, 'October': 10, 'November': 11, 'December': 12
+            };
+            return monthOrder[a.datetime] - monthOrder[b.datetime];
+        });
 
         return {
             "data": monthlyResults
         };
     } catch (error) {
-        return { error: error.message };
+        return {error: error.message};
     }
 }
 
@@ -1329,7 +1324,7 @@ async function fetchDatastream(fieldName, datastreamName) {
             console.log(`[ERROR] No data returned for fieldName: ${fieldName}`);
             return undefined;
         }
-        if(data["@iot.count"] === 0) {
+        if (data["@iot.count"] === 0) {
             console.log(`[ERROR] No things found for fieldName: ${fieldName}`);
             return undefined;
         }
@@ -1338,7 +1333,7 @@ async function fetchDatastream(fieldName, datastreamName) {
         console.log(`[ERROR] Failed to fetch datastream for fieldName: ${fieldName}, error:`, error.message);
         return undefined;
     });
-    if(datastreamsLink === undefined) {
+    if (datastreamsLink === undefined) {
         return undefined;
     }
     return await fetchAllPagesFromDatabase(datastreamsLink).then(async (data) => {
@@ -1762,58 +1757,57 @@ async function produceFieldThing(thing) {
     });
 
 
-
     thing.setPropertyReadHandler("modelOutputs", async (_params, options) => {
         //http://localhost/acquaountpinos/properties/modelOutputs
 
         // Check if this is a basin or field thing
         const thingType = thing.getThingDescription().thingType;
-            let twoDaysAgo = new Date();
-            twoDaysAgo.setHours(0, 0, 0, 0);
-            twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+        let twoDaysAgo = new Date();
+        twoDaysAgo.setHours(0, 0, 0, 0);
+        twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
 
-            let sevenDaysAhead = new Date();
-            sevenDaysAhead.setHours(0, 0, 0, 0);
-            sevenDaysAhead.setDate(sevenDaysAhead.getDate() + 8);
+        let sevenDaysAhead = new Date();
+        sevenDaysAhead.setHours(0, 0, 0, 0);
+        sevenDaysAhead.setDate(sevenDaysAhead.getDate() + 8);
 
-            let daily_irr_volume_observations = await fetchAllObservationsInDatastreamInRange(thing.getThingDescription().fieldName, thing.getThingDescription().fieldName + "_DailyIrrigationGivenPrediction", formatDate(twoDaysAgo), formatDate(sevenDaysAhead), 330, 0);
-            let daily_irr_deficit_observations = await fetchAllObservationsInDatastreamInRange(thing.getThingDescription().fieldName, thing.getThingDescription().fieldName + "_DailyIrrigationDeficitPrediction", formatDate(twoDaysAgo), formatDate(sevenDaysAhead), 330, 0);
-            let daily_soil_m_observations = await fetchAllObservationsInDatastreamInRange(thing.getThingDescription().fieldName, thing.getThingDescription().fieldName + "_DailySoilMoisturePrediction", formatDate(twoDaysAgo), formatDate(sevenDaysAhead), 330, 0);
+        let daily_irr_volume_observations = await fetchAllObservationsInDatastreamInRange(thing.getThingDescription().fieldName, thing.getThingDescription().fieldName + "_DailyIrrigationGivenPrediction", formatDate(twoDaysAgo), formatDate(sevenDaysAhead), 330, 0);
+        let daily_irr_deficit_observations = await fetchAllObservationsInDatastreamInRange(thing.getThingDescription().fieldName, thing.getThingDescription().fieldName + "_DailyIrrigationDeficitPrediction", formatDate(twoDaysAgo), formatDate(sevenDaysAhead), 330, 0);
+        let daily_soil_m_observations = await fetchAllObservationsInDatastreamInRange(thing.getThingDescription().fieldName, thing.getThingDescription().fieldName + "_DailySoilMoisturePrediction", formatDate(twoDaysAgo), formatDate(sevenDaysAhead), 330, 0);
 
-            if(daily_irr_volume_observations === undefined || daily_irr_deficit_observations === undefined || daily_soil_m_observations === undefined) {
-                return {result: false, message: 'No observations found'};
+        if (daily_irr_volume_observations === undefined || daily_irr_deficit_observations === undefined || daily_soil_m_observations === undefined) {
+            return {result: false, message: 'No observations found'};
+        }
+
+        let time_of_measure = new Set();
+        daily_irr_volume_observations.forEach(item => {
+            time_of_measure.add(item.time_of_measure);
+        });
+        daily_irr_deficit_observations.forEach(item => {
+            time_of_measure.add(item.time_of_measure);
+        });
+        daily_soil_m_observations.forEach(item => {
+            time_of_measure.add(item.time_of_measure);
+        });
+        time_of_measure = Array.from(time_of_measure).sort();
+        daily_irr_volume_values = []
+        daily_irr_deficit_values = []
+        daily_soil_m_values = []
+
+        function getLatestValueForTime(observations, time) {
+            let observations_for_the_day = observations.filter(item => item.time_of_measure == time);
+            observations_for_the_day.sort((a, b) => new Date(b.result_time) - new Date(a.result_time));
+            if (observations_for_the_day.length > 0) {
+                return observations_for_the_day[0].value;
+            } else {
+                return null;
             }
+        }
 
-            let time_of_measure = new Set();
-            daily_irr_volume_observations.forEach(item => {
-                time_of_measure.add(item.time_of_measure);
-            });
-            daily_irr_deficit_observations.forEach(item => {
-                time_of_measure.add(item.time_of_measure);
-            });
-            daily_soil_m_observations.forEach(item => {
-                time_of_measure.add(item.time_of_measure);
-            });
-            time_of_measure = Array.from(time_of_measure).sort();
-            daily_irr_volume_values = []
-            daily_irr_deficit_values = []
-            daily_soil_m_values = []
-
-            function getLatestValueForTime(observations,time) {
-                let observations_for_the_day = observations.filter(item => item.time_of_measure == time);
-                observations_for_the_day.sort((a, b) => new Date(b.result_time) - new Date(a.result_time));
-                if (observations_for_the_day.length > 0) {
-                    return observations_for_the_day[0].value;
-                } else {
-                    return null;
-                }
-            }
-
-            time_of_measure.forEach(time => {
-                daily_irr_volume_values.push(getLatestValueForTime(daily_irr_volume_observations, time));
-                daily_irr_deficit_values.push(getLatestValueForTime(daily_irr_deficit_observations, time));
-                daily_soil_m_values.push(getLatestValueForTime(daily_soil_m_observations, time));
-            });
+        time_of_measure.forEach(time => {
+            daily_irr_volume_values.push(getLatestValueForTime(daily_irr_volume_observations, time));
+            daily_irr_deficit_values.push(getLatestValueForTime(daily_irr_deficit_observations, time));
+            daily_soil_m_values.push(getLatestValueForTime(daily_soil_m_observations, time));
+        });
 
 
         time_of_measure_string = time_of_measure.map(item => item.split("T")[0]);
@@ -1824,9 +1818,9 @@ async function produceFieldThing(thing) {
         Object.keys(irrigation_dates).forEach(key => {
             vertical_lines.push({[key]: irrigation_dates[key]});
         });
-       return {
-            "labels":time_of_measure_string,
-            "datasets":[
+        return {
+            "labels": time_of_measure_string,
+            "datasets": [
                 {
                     "label": "Suggested full irrigation",
                     "data": daily_irr_volume_values
@@ -1885,10 +1879,10 @@ async function produceFieldThing(thing) {
                 result: params["values"][propertyName],
                 phenomenonTime: phenomTime
             };
-            if(Object.keys(params['info']).includes("resultTime")) {
+            if (Object.keys(params['info']).includes("resultTime")) {
                 observation_body.resultTime = params['info']['resultTime'];
             }
-            if(Object.keys(params['info']).includes("parameters")) {
+            if (Object.keys(params['info']).includes("parameters")) {
                 observation_body.parameters = params['info']['parameters'];
             }
 
@@ -1996,8 +1990,7 @@ servient.start().then(async (WoT) => {
             let desc = "";
             if (Object.keys(params).includes("description")) {
                 desc = params["description"];
-            }else
-            {
+            } else {
                 desc = "Field " + params["username"] + "-" + params["fieldName"] + "-" + params["environment"];
             }
 
@@ -2022,7 +2015,7 @@ servient.start().then(async (WoT) => {
             let jsonField = {
                 "id": "acquaount:" + fieldId,
                 "title": fieldFinalName,
-                "fieldName":fieldFinalName,
+                "fieldName": fieldFinalName,
                 "description": fieldFinalName
             };
 
@@ -2121,19 +2114,19 @@ servient.start().then(async (WoT) => {
                     "description": "Daily Irrigation Given Prediction, result of the irrigation model",
                     "definition": "Irrigation Given",
                     "properties": {}
-                    },
-                    {
+                },
+                {
                     "name": "Daily Irrigation Deficit Prediction",
                     "description": "Daily Irrigation Deficit Prediction, result of the irrigation model",
                     "definition": "Daily Irrigation Deficit",
                     "properties": {}
-                    },
-                    {
+                },
+                {
                     "name": "Daily Soil Moisture Prediction",
                     "description": "Daily Soil Moisture Prediction, result of the irrigation model",
                     "definition": "Daily Soil Moisture",
                     "properties": {}
-                    }
+                }
             ]
 
             for (let propert of properties_data) {
@@ -2202,12 +2195,8 @@ servient.start().then(async (WoT) => {
 
     /* FIELDS */
     let patterns = [
-        'src/resources/thingDescription/Fields/Custom/*',
-        'src/resources/thingDescription/Fields/Italy/*',
-        'src/resources/thingDescription/Fields/Jordan/*',
-        'src/resources/thingDescription/Fields/Lebanon/*',
-        'src/resources/thingDescription/Fields/Tunisia/*',
-        'src/resources/thingDescription/Fields/Custom/*',
+        'src/resources/thingDescription/Fields/**.td.json',
+        'src/resources/thingDescription/Fields/*/*.td.json',
     ]
 
     let filenames = [];
@@ -2215,13 +2204,14 @@ servient.start().then(async (WoT) => {
         filenames = filenames.concat(glob.globSync(pattern));
     }
 
-    filenames.push('src/resources/thingDescription/Fields/Demo/demo.td.json');
-
     for (let i = 0; i < filenames.length; i++) {
         filenames[i] = filenames[i].replace(/\\/g, "/");
     }
 
     for (let i = 0; i < filenames.length; i++) {
+        if (filenames[i] === 'src/resources/thingDescription/Fields/base.td.json') {
+            continue;
+        }
         let jsonBase = readJsonFileSync('src/resources/thingDescription/Fields/base.td.json');
         let jsonSpecific = readJsonFileSync(filenames[i]);
 
@@ -2240,9 +2230,10 @@ servient.start().then(async (WoT) => {
 
     /* BASIN WATER RESOURCE */
     patterns = [
-        'src/resources/thingDescription/Basin/WaterResource/Italy/*',
-        'src/resources/thingDescription/Basin/WaterResource/Tunisia/*',
-        'src/resources/thingDescription/Basin/WaterResource/Lebanon/*'
+        'src/resources/thingDescription/Basin/WaterResource/**.td.json',
+        'src/resources/thingDescription/Basin/WaterResource/*/*.td.json',
+        'src/resources/thingDescription/Basin/WaterDemand/**.td.json',
+        'src/resources/thingDescription/Basin/WaterDemand/*/*.td.json',
     ]
 
     filenames = [];
@@ -2255,6 +2246,9 @@ servient.start().then(async (WoT) => {
     }
 
     for (let i = 0; i < filenames.length; i++) {
+        if (filenames[i] === 'src/resources/thingDescription/Basin/WaterResource/base.td.json') {
+            continue;
+        }
         let jsonBase = readJsonFileSync('src/resources/thingDescription/Basin/WaterResource/base.td.json');
         let jsonSpecific = readJsonFileSync(filenames[i]);
 
@@ -2466,10 +2460,10 @@ servient.start().then(async (WoT) => {
                         phenomenonTime: phenomTime
 
                     };
-                    if(Object.keys(params['info']).includes("resultTime")) {
+                    if (Object.keys(params['info']).includes("resultTime")) {
                         observation_body.resultTime = params['info']['resultTime'];
                     }
-                    if(Object.keys(params['info']).includes("parameters")) {
+                    if (Object.keys(params['info']).includes("parameters")) {
                         observation_body.parameters = params['info']['parameters'];
                     }
                     let response = await postToDatabase(url, observation_body);
@@ -2533,10 +2527,8 @@ servient.start().then(async (WoT) => {
 
     /* STATIONS */
     patterns = [
-        'src/resources/thingDescription/Stations/Tunisia/*',
-        'src/resources/thingDescription/Stations/Jordan/*',
-        'src/resources/thingDescription/Stations/Lebanon/*',
-        'src/resources/thingDescription/Stations/Italy/*'
+        'src/resources/thingDescription/Stations/**.td.json',
+        'src/resources/thingDescription/Stations/*/*.td.json',
     ]
 
     filenames = [];
@@ -2549,6 +2541,9 @@ servient.start().then(async (WoT) => {
     }
 
     for (let i = 0; i < filenames.length; i++) {
+        if (filenames[i] === 'src/resources/thingDescription/Stations/base.td.json') {
+            continue;
+        }
         let jsonBase = readJsonFileSync('src/resources/thingDescription/Stations/base.td.json');
         let jsonSpecific = readJsonFileSync(filenames[i]);
 
@@ -2728,10 +2723,10 @@ servient.start().then(async (WoT) => {
                         result: params["values"][propertyName],
                         phenomenonTime: phenomTime
                     };
-                    if(Object.keys(params['info']).includes("resultTime")) {
+                    if (Object.keys(params['info']).includes("resultTime")) {
                         observation_body.resultTime = params['info']['resultTime'];
                     }
-                    if(Object.keys(params['info']).includes("parameters")) {
+                    if (Object.keys(params['info']).includes("parameters")) {
                         observation_body.parameters = params['info']['parameters'];
                     }
                     let response = await postToDatabase(url, observation_body);
@@ -2792,7 +2787,6 @@ servient.start().then(async (WoT) => {
             console.log(e);
         });
     }
-
 
 
     /* START SERVER */
