@@ -2,9 +2,9 @@ from datetime import datetime, timedelta
 from ftplib import FTP
 from threading import Lock
 
-ftp_host = '3.122.140.39'
-ftp_user = 'elard'
-ftp_password = '1gcRBF9Xjx'
+ftp_host = ''
+ftp_user = ''
+ftp_password = ''
 
 headers = []
 output_data = []
@@ -108,7 +108,6 @@ def get_historic_function(thing, ftplock=None):
         ftp.login(ftp_user, ftp_password)
 
         files = ftp.nlst()
-        # print("Files in the current directory:", files)
 
         for file in files:
             if file.startswith(thing):

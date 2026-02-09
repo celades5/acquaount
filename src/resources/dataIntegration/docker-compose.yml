@@ -5,6 +5,8 @@ services:
     build:
       context: .
       dockerfile: DockerfileHistoric
+    volumes:
+      - ./data:/data
     networks:
       - acquaount-platform_default
 

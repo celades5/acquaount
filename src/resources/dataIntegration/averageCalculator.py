@@ -8,8 +8,7 @@ from tqdm import tqdm
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-# serverUrl = "http://sensorthings-api:8080"
-serverUrl = "https://84.88.76.18/wotst"
+serverUrl = "http://sensorthings-api:8080"
 
 
 def calculate_averages():
@@ -39,7 +38,8 @@ def calculate_averages():
             observations_url_base = str(og_datastream['Observations@iot.navigationLink']).replace(
                 "http://localhost:8008", serverUrl)
 
-            today = datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0).strftime("%Y-%m-%dT%H:%M:%SZ")
+            today = datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0).strftime(
+                "%Y-%m-%dT%H:%M:%SZ")
             last_week = datetime.datetime.now() - datetime.timedelta(days=7)
             time_s = last_week.strftime("%Y-%m-%dT%H:%M:%SZ")
 
@@ -69,16 +69,10 @@ def calculate_averages():
                 continue
             average_value = total_value / total_measures
 
-            if normal_datastream_name == "ENAS_1067_Water_Storage_m3":
-                packet = {
-                    "result": int(math.floor(average_value)),
-                    "phenomenonTime": today
-                }
-            else:
-                packet = {
-                    "result": average_value,
-                    "phenomenonTime": today
-                }
+            packet = {
+                "result": average_value,
+                "phenomenonTime": today
+            }
 
             average_observations_url = datastream['Observations@iot.navigationLink'].replace(
                 "http://localhost:8008", serverUrl)
@@ -119,19 +113,7 @@ def calculate_averages_historic():
             observations_url_base = str(og_datastream['Observations@iot.navigationLink']).replace(
                 "http://localhost:8008", serverUrl)
 
-            # observations_url = observations_url_base + f"?$orderBy=phenomenonTime asc&$top=1"
-
-            # first_observation_req = r.get(observations_url, verify=False)
-
-            # first_observation = json.loads(first_observation_req.text)["value"]
-            # if len(first_observation) == 0:
-            #    continue
-            # try:
-            #    measureDate = datetime.datetime.strptime(first_observation[0]['phenomenonTime'], "%Y-%m-%dT%H:%M:%S.%fZ")
-            # except ValueError:
-            #    measureDate = datetime.datetime.strptime(first_observation[0]['phenomenonTime'], "%Y-%m-%dT%H:%M:%SZ")
-
-            measureDate = datetime.datetime.now() - datetime.timedelta(days=31*6)
+            measureDate = datetime.datetime.now() - datetime.timedelta(days=31 * 6)
 
             measureDate = measureDate.replace(hour=0, minute=0, second=0, microsecond=0)
 
@@ -146,7 +128,8 @@ def calculate_averages_historic():
 
                 average_observations_url = (
                         str(datastream['Observations@iot.navigationLink']).replace(
-                            "http://localhost:8008", serverUrl) + f"?$filter=phenomenonTime ge {(measuresStart + datetime.timedelta(days=1)).strftime('%Y-%m-%dT%H:%M:%SZ')}"
+                            "http://localhost:8008",
+                            serverUrl) + f"?$filter=phenomenonTime ge {(measuresStart + datetime.timedelta(days=1)).strftime('%Y-%m-%dT%H:%M:%SZ')}"
                         + f" and phenomenonTime le {measureDate.strftime('%Y-%m-%dT%H:%M:%SZ')}")
 
                 check_if_created_req = r.get(average_observations_url, verify=False)
@@ -203,6 +186,7 @@ def calculate_averages_historic():
                 measureDate = measureDate + datetime.timedelta(days=7)
     return createds
 
+
 def calculate_averages_historic_single_datastream(datastream_name):
     skip = 0
     num_of_ds = 100
@@ -232,7 +216,7 @@ def calculate_averages_historic_single_datastream(datastream_name):
             observations_url_base = str(og_datastream['Observations@iot.navigationLink']).replace(
                 "http://localhost:8008", serverUrl)
 
-            measureDate = datetime.datetime.now() - datetime.timedelta(days=31*6)
+            measureDate = datetime.datetime.now() - datetime.timedelta(days=31 * 6)
 
             measureDate = measureDate.replace(hour=0, minute=0, second=0, microsecond=0)
 
@@ -247,7 +231,8 @@ def calculate_averages_historic_single_datastream(datastream_name):
 
                 average_observations_url = (
                         str(datastream['Observations@iot.navigationLink']).replace(
-                            "http://localhost:8008", serverUrl) + f"?$filter=phenomenonTime ge {(measuresStart + datetime.timedelta(days=1)).strftime('%Y-%m-%dT%H:%M:%SZ')}"
+                            "http://localhost:8008",
+                            serverUrl) + f"?$filter=phenomenonTime ge {(measuresStart + datetime.timedelta(days=1)).strftime('%Y-%m-%dT%H:%M:%SZ')}"
                         + f" and phenomenonTime le {measureDate.strftime('%Y-%m-%dT%H:%M:%SZ')}")
 
                 check_if_created_req = r.get(average_observations_url, verify=False)
@@ -307,6 +292,6 @@ def calculate_averages_historic_single_datastream(datastream_name):
                 measureDate = measureDate + datetime.timedelta(days=7)
     return createds
 
+
 if __name__ in "__main__":
-    # calculate_averages_historic_single_datastream('AVG_WEEKLY_ENAS_1067_Water_Storage_m3')
     calculate_averages_historic_single_datastream('AVG_WEEKLY_ENAS_10329_Water_Storage_m3')

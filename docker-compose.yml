@@ -18,9 +18,6 @@ services:
     build:
       context: src/resources/dataIntegration/
       dockerfile: Dockerfile
-    volumes:
-      - ./src/resources/dataIntegration/logs/:/logs/
-      - ./src/resources/modelService/dk/results/:/modelData/
     depends_on:
       - acquaount-platform
     environment:
