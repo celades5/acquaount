@@ -78,3 +78,5 @@ The Binding Templates defined inside the thing descriptions describe how to inte
 
 WoT-Server does not have automated tests, the following [Postman collection](https://www.postman.com/orange-comet-247459/workspace/wot-server-example-endpoints/collection/18279882-309079ec-7ba2-4c14-9d69-3f89b1fe321c?action=share&creator=18279882&active-environment=18279882-52d6afdd-3ec1-40b0-976d-2115edbda08d) can be used to test functionality. The collection contains example HTTP requests for how to interact with WoT-Server and also examples of successful HTTP responses so they can be compared with individual results. 
 
+## AI Usage Disclosure
+Generative AI (ChatGPT) has been used in small sections of code development, mostly confined in Docker and Docker Compose related files. No Generative AI has been used to write the documentation or the paper related to the repository. 
