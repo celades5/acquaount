@@ -944,7 +944,7 @@ async function produceFieldThing(thing) {
 
 servient.start().then(async (WoT) => {
     let mainJson = readJsonFileSync('src/resources/thingDescription/main.td.json');
-    let creationPath = 'src/resources/thingDescription/Fields/Custom/'
+    let creationPath = 'src/resources/thingDescription/Fields/Things/'
 
     mainJson['base'] = config_baseurl;
 

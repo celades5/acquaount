@@ -27,11 +27,13 @@ After deploying the server, the datastreams must be created. They can be created
 + Device Description: A description of the sensor used.
 + Device Type: A short string used to identify the make and model of the sensor.
 + Device EUI: A number to identify the sensor.
-+ **Property Name**: The name of the property observed in the datastream.
++ **Property Key**: The key of the property observed in the datastream. It needs to be unique in the sensor.
++ Property Name: The name of the property observed in the datastream. It differs in the Property Key because it can be duplicated, for example for a sensor that reads Soil Moisture at multiple depths. Keys must be unique (Soil_Moisture_1, _2, ...) but the name can be repeated.
 + Property Description: A description of the property.
 + Unit Of Measurement and Unit Of Measurement Symbol: Name and symbol of the unit of measurement of the data in the datastream.
 + **Datastream Name**: The datastream name. In the examples it's generated automatically as \<Field Name\>\_\<Device ID\>\_\<Property Name\> and replacing the spaces for underscores but this naming convention is not enforced.
 + Datastream Description: A description of the datastream. Like with the name, it's generated automatically, but it's not mandatory to follow the same structure.
++ Averages: Use to define if there should be a weekly aggregate of this datastream by setting this column as 'Weekly'.
 
 The script will handle the creation of all types of instances, extracted from the rows of data, while making sure to not create duplicates. The script was created and tested using Python 3.13, which you must install to run the script. Once Python 3.13 is installed, the dependencies to run the script must be installed using the following command, taking into account the fact that the path to the requirements.txt file will change depending on the working directory:  
 >python3 -m pip install -r \[Path to requirements.txt\]  

@@ -65,11 +65,7 @@ if __name__ in "__main__":
                 response = r.post(f"{baseurl}/Locations", data=json.dumps(location_body), verify=False)
                 print(response.status_code)
             else:
-                things_req = r.get(
-                    location_json["value"][0]["Things@iot.navigationLink"].replace("localhost",
-                                                                                   "84.88.76.18/wotst").replace("http",
-                                                                                                                "https"),
-                    verify=False)
+                things_req = r.get(location_json["value"][0]["Things@iot.navigationLink"], verify=False)
                 for thing in things_req.json()["value"]:
                     if int(thing["@iot.id"]) == thing_id:
                         break
@@ -148,7 +144,7 @@ if __name__ in "__main__":
                 print(response.status_code)
 
             # Aggregates
-            if row['Averages'] == 'Weekly':
+            if 'Averages' in row and row['Averages'] == 'Weekly':
                 average_datastream_name = "AVG_WEEKLY_" + row['Datastream Name']
                 datastream_res = r.get(f"{baseurl}/Datastreams?$filter=name eq '{average_datastream_name}'",
                                        verify=False)
