@@ -5,7 +5,7 @@ Docker and Docker Compose are required in order to run WoT-Server. Running the C
 ## Getting Started
 Before deploying the server, the Things must be created. Even though creating them while the deployed server is possible, creating them beforehand is cleaner and faster.  
 
-To create new Things that will be deployed once the server is started, the user must navigate to the _src/resources/thingDescription_ folder and create as many Things as desired. To create a Thing, simply copy any of the provided Thing descriptions and change the id, title, name, and description. The name attribute can be fieldName, stationName, or itemName, depending on the Thing Type. It is important that each Thing is placed in its correct folder and that the filename ends in "_.td.json_".  
+To create new Things that will be deployed once the server is started, the user must navigate to the _src/resources/thingDescription/Things_ folder and create as many Things as desired. To create a Thing, simply the Demo Thing description and change the id, title, name, and description. It is important that all Things (except main.td.json) are placed in this folder and that the filename ends in "_.td.json_".  
 
 Once things are defined, the WoT-Server can be deployed. To run/deploy:
 >docker compose up --build -d
@@ -33,10 +33,13 @@ After deploying the server, the datastreams must be created. They can be created
 + **Datastream Name**: The datastream name. In the examples it's generated automatically as \<Field Name\>\_\<Device ID\>\_\<Property Name\> and replacing the spaces for underscores but this naming convention is not enforced.
 + Datastream Description: A description of the datastream. Like with the name, it's generated automatically, but it's not mandatory to follow the same structure.
 
-The script will handle the creation of all types of instances, extracted from the rows of data, while making sure to not create duplicates. To run the script, navigate to the directory and run the following command:
->python3 init_database.py \<csv_file.csv\> \[\<SensorThings Server URL\>\]  
+The script will handle the creation of all types of instances, extracted from the rows of data, while making sure to not create duplicates. The script was created and tested using Python 3.13, which you must install to run the script. Once Python 3.13 is installed, the dependencies to run the script must be installed using the following command, taking into account the fact that the path to the requirements.txt file will change depending on the working directory:  
+>python3 -m pip install -r \[Path to requirements.txt\]  
 
-This script can be run as many times as necessary, and it will check for duplicates every time. It is not necessary to run every time the WoT-Server is redeployed, since data is stored in a volume and persisted between sessions.  
+Once the dependencies are installed, the script is executed with the following command:
+>python3 init_database.py \<csv_file.csv\> \[\<SensorThings Server URL\>\]  
+ 
+The arguments for this script are first, a path to a csv file containing the data to be uploaded in the format described previously. Second, the URL to the server can be specified optionally (it will use a default value from inside the Docker network if not specified). If a custom URL is used, it should be defined WITHOUT a "/" at the end, to avoid errors. Finally, this script can be run as many times as necessary, and it will check for duplicates every time. It is not necessary to run every time the WoT-Server is redeployed, since data is stored in a volume and persisted between sessions.  
 
 ## Statement Of Need
 WoT-Server was created as a centralised data management solution for the ACQUAOUNT Project. One of the objectives of the ACQUAOUNT Project is providing smart irrigation recommendations to farmers using a water balance model. This model takes as input timeseries data of different properties of the specified field, such as temperature, soil moisture and wind speed, and calculates the best date and amount of irrigation. WoT-Server was developed as a standardized API to allow easy access to farm/water management data for further model implementation and to simplify the upload, storage and retrieval procedures of measurements from sensors in the field. WoT-Server is capable of both receiving data via an HTTP endpoint or fetching the data itself from other API services, a feature useful for centralising data from multiple platforms.  

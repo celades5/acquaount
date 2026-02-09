@@ -1,4 +1,0 @@
-cp DockerfileBasic Dockerfile
-echo CMD [\"sh\", \"-c\", \"python3 download_data.py test.json && python3 createJSONconfig.py test.json && Rscript crop.R\"] >> Dockerfile
-docker build -t model_acquaount_irr:1.0.0 .
-docker run -d -v ./data/:/data/ model_acquaount_irr:1.0.0

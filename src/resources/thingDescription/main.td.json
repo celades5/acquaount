@@ -29,18 +29,6 @@
             "readOnly": false,
             "writeOnly": false
           },
-          "username": {
-            "type": "string",
-            "description": "username of the person creating the field",
-            "readOnly": false,
-            "writeOnly": false
-          },
-          "environment": {
-            "type": "string",
-            "description": "Environment used to create the field",
-            "readOnly": false,
-            "writeOnly": false
-          },
           "description": {
             "type": "string",
             "description": "An optional description for the field",

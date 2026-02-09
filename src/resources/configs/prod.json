@@ -1,4 +1,5 @@
 {
   "urlhost": "http://sensorthings-api:8080",
-  "baseurl": "http://84.88.76.18"
+  "baseurl": "http://84.88.76.18",
+  "baseuri": "http://84.88.76.18/wot"
 }

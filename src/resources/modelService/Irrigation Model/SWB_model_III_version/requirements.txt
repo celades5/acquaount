@@ -1,6 +1,0 @@
-requests
-numpy
-openmeteo-requests
-requests-cache
-retry-requests
-pandas

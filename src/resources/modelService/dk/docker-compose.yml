@@ -1,9 +1,0 @@
-version: "3"
-
-services:
-  batch:
-    build: .
-    volumes:
-      - ./results:/dk/HMS_Tirso_v3/results
-      - ./HMS_Tirso_v3/data:/dk/HMS_Tirso_v3/data
-    restart: on-failure

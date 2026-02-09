@@ -1,0 +1,849 @@
+{
+  "id": "acquaount:demosite",
+  "@context": "https://www.w3.org/2022/wot/td/v1.1",
+  "title": "AcquaountThingBase",
+  "thingType": "Field",
+  "fieldName": "Base",
+  "securityDefinitions": {
+    "basic_sc": {
+      "scheme": "nosec"
+    }
+  },
+  "security": [
+    "basic_sc"
+  ],
+  "description": "Base Thing Description",
+  "properties": {
+    "fieldInformation": {
+      "type": "object",
+      "description": "The information of the site this thing represents",
+      "readOnly": true,
+      "writeOnly": false,
+      "observable": false,
+      "forms": [
+        {
+          "href": "/properties/thingInformation",
+          "contentType": "application/json",
+          "op": "readproperty",
+          "htv:methodName": "GET"
+        }
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "readOnly": true,
+          "writeOnly": false,
+          "description": "The name of the field"
+        },
+        "description": {
+          "type": "string",
+          "readOnly": true,
+          "writeOnly": false,
+          "description": "A description about the field"
+        },
+        "pilot": {
+          "type": "string",
+          "readOnly": true,
+          "writeOnly": false,
+          "description": "The pilot of this field"
+        },
+        "location": {
+          "type": "object",
+          "readOnly": true,
+          "writeOnly": false,
+          "format": "geojson",
+          "href": "https://datatracker.ietf.org/doc/html/rfc7946#section-3.1",
+          "description": "The location of the field in GeoJSON Geometry format"
+        }
+      }
+    },
+    "sensorsList": {
+      "type": "array",
+      "description": "The list of sensors of this thing",
+      "readOnly": true,
+      "writeOnly": false,
+      "observable": false,
+      "forms": [
+        {
+          "href": "/properties/sensorList",
+          "contentType": "application/json",
+          "op": "readproperty",
+          "htv:methodName": "GET"
+        }
+      ],
+      "items": {
+        "type": "object",
+        "readOnly": true,
+        "writeOnly": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "readOnly": true,
+            "writeOnly": false,
+            "description": "The name of the sensor"
+          },
+          "description": {
+            "type": "string",
+            "readOnly": true,
+            "writeOnly": false,
+            "description": "A description of the sensor"
+          },
+          "properties": {
+            "type": "object",
+            "readOnly": true,
+            "writeOnly": false,
+            "description": "The properties of the sensor",
+            "properties": {
+              "deviceID": {
+                "type": "string",
+                "readOnly": true,
+                "writeOnly": false,
+                "description": "The device's ID according to the list (D001, D002, I001, ...)"
+              },
+              "device_type": {
+                "type": "string",
+                "readOnly": true,
+                "writeOnly": false,
+                "description": "The device's type according to the list (ST01, ST02, ...)"
+              },
+              "device_eui": {
+                "type": "string",
+                "readOnly": true,
+                "writeOnly": false,
+                "description": "The device's EUI according to the list"
+              }
+            }
+          }
+        }
+      }
+    },
+    "sensorInformation": {
+      "type": "object",
+      "description": "The information of a sensor of this thing",
+      "readOnly": true,
+      "writeOnly": false,
+      "observable": false,
+      "uriVariables": {
+        "deviceID": {
+          "type": "string",
+          "readOnly": true,
+          "writeOnly": false,
+          "description": "The device ID of the sensor"
+        }
+      },
+      "forms": [
+        {
+          "href": "/properties/sensorInformation",
+          "contentType": "application/json",
+          "op": "readproperty",
+          "htv:methodName": "POST"
+        }
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "readOnly": true,
+          "writeOnly": false,
+          "description": "The name of the sensor"
+        },
+        "description": {
+          "type": "string",
+          "readOnly": true,
+          "writeOnly": false,
+          "description": "A description of the sensor"
+        },
+        "properties": {
+          "type": "object",
+          "readOnly": true,
+          "writeOnly": false,
+          "description": "The properties of the sensor",
+          "properties": {
+            "deviceID": {
+              "type": "string",
+              "readOnly": true,
+              "writeOnly": false,
+              "description": "The device's ID according to the list (D001, D002, I001, ...)"
+            },
+            "device_type": {
+              "type": "string",
+              "readOnly": true,
+              "writeOnly": false,
+              "description": "The device's type according to the list (ST01, ST02, ...)"
+            },
+            "device_eui": {
+              "type": "string",
+              "readOnly": true,
+              "writeOnly": false,
+              "description": "The device's EUI according to the list"
+            }
+          }
+        }
+      }
+    },
+    "propertiesList": {
+      "type": "array",
+      "description": "The list of observed properties of this thing",
+      "readOnly": true,
+      "writeOnly": false,
+      "observable": false,
+      "forms": [
+        {
+          "href": "/properties/propertiesList",
+          "contentType": "application/json",
+          "op": "readproperty",
+          "htv:methodName": "GET"
+        }
+      ],
+      "items": {
+        "type": "object",
+        "readOnly": true,
+        "writeOnly": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "readOnly": true,
+            "writeOnly": false,
+            "description": "The name of the property"
+          },
+          "description": {
+            "type": "string",
+            "readOnly": true,
+            "writeOnly": false,
+            "description": "A description of the property"
+          }
+        }
+      }
+    },
+    "propertyInformation": {
+      "type": "object",
+      "description": "The information of a property of this thing",
+      "readOnly": true,
+      "writeOnly": false,
+      "observable": false,
+      "uriVariables": {
+        "name": {
+          "type": "string",
+          "readOnly": true,
+          "writeOnly": false,
+          "description": "The name of the property"
+        }
+      },
+      "forms": [
+        {
+          "href": "/properties/propertyInformation",
+          "contentType": "application/json",
+          "op": "readproperty",
+          "htv:methodName": "GET"
+        }
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "readOnly": true,
+          "writeOnly": false,
+          "description": "The name of the property"
+        },
+        "description": {
+          "type": "string",
+          "readOnly": true,
+          "writeOnly": false,
+          "description": "A description of the property"
+        }
+      }
+    },
+    "datastreamsList": {
+      "type": "array",
+      "description": "The list of datasources of this thing",
+      "readOnly": true,
+      "writeOnly": false,
+      "observable": false,
+      "forms": [
+        {
+          "href": "/properties/datasourcesList",
+          "contentType": "application/json",
+          "op": "readproperty",
+          "htv:methodName": "GET"
+        }
+      ],
+      "items": {
+        "type": "object",
+        "readOnly": true,
+        "writeOnly": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "readOnly": true,
+            "writeOnly": false,
+            "description": "The name of the datasource"
+          },
+          "description": {
+            "type": "string",
+            "readOnly": true,
+            "writeOnly": false,
+            "description": "A description of the datasource"
+          },
+          "unit_of_measurement": {
+            "type": "string",
+            "readOnly": true,
+            "writeOnly": false,
+            "description": "The unit of measurement of the observations of this datasource"
+          },
+          "deviceID": {
+            "type": "string",
+            "readOnly": true,
+            "writeOnly": false,
+            "description": "The name of the sensor of this datastream"
+          },
+          "property_name": {
+            "type": "string",
+            "readOnly": true,
+            "writeOnly": false,
+            "description": "The name of the property being observed by this datastream"
+          }
+        }
+      }
+    },
+    "datastreamInformation": {
+      "description": "The information of a datasource of this thing",
+      "readOnly": true,
+      "writeOnly": false,
+      "observable": false,
+      "uriVariables": {
+        "name": {
+          "type": "string",
+          "readOnly": true,
+          "writeOnly": false,
+          "description": "The name of the datasource"
+        }
+      },
+      "forms": [
+        {
+          "href": "/properties/propertyInformation",
+          "contentType": "application/json",
+          "op": "readproperty",
+          "htv:methodName": "GET"
+        }
+      ],
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "readOnly": true,
+          "writeOnly": false,
+          "description": "The name of the datasource"
+        },
+        "description": {
+          "type": "string",
+          "readOnly": true,
+          "writeOnly": false,
+          "description": "A description of the datasource"
+        },
+        "unit_of_measurement": {
+          "type": "string",
+          "readOnly": true,
+          "writeOnly": false,
+          "description": "The unit of measurement of the observations of this datasource"
+        },
+        "deviceID": {
+          "type": "string",
+          "readOnly": true,
+          "writeOnly": false,
+          "description": "The name of the sensor of this datastream"
+        },
+        "property_name": {
+          "type": "string",
+          "readOnly": true,
+          "writeOnly": false,
+          "description": "The name of the property being observed by this datastream"
+        }
+      }
+    },
+    "datastreamLastMeasure": {
+      "description": "The last measure of the specified datastream",
+      "readOnly": true,
+      "writeOnly": false,
+      "observable": false,
+      "uriVariables": {
+        "name": {
+          "type": "string",
+          "readOnly": true,
+          "writeOnly": false,
+          "description": "The name of the datastream"
+        }
+      },
+      "forms": [
+        {
+          "href": "/properties/datasourceLastMeasure",
+          "contentType": "application/json",
+          "op": "readproperty",
+          "htv:methodName": "GET"
+        }
+      ],
+      "type": "object",
+      "properties": {
+        "deviceID": {
+          "type": "string",
+          "readOnly": true,
+          "writeOnly": false,
+          "description": "The ID of the sensor that took this measure"
+        },
+        "property_name": {
+          "type": "string",
+          "readOnly": true,
+          "writeOnly": false,
+          "description": "The name of the property observed in this measure"
+        },
+        "datastream_name": {
+          "type": "string",
+          "readOnly": true,
+          "writeOnly": false,
+          "description": "The name of the datastream containing this measure"
+        },
+        "unit_of_measurement": {
+          "type": "string",
+          "readOnly": true,
+          "writeOnly": false,
+          "description": "The unit of measurement of the observation"
+        },
+        "value": {
+          "type": "string",
+          "readOnly": true,
+          "writeOnly": false,
+          "description": "The value of the observation"
+        },
+        "time_of_measure": {
+          "type": "string",
+          "readOnly": true,
+          "writeOnly": false,
+          "description": "The time when the observation was taken"
+        }
+      }
+    },
+    "datastreamAggregateMeasure": {
+      "description": "The weekly average of measures of the last 6 months, ending on the specified date",
+      "readOnly": true,
+      "writeOnly": false,
+      "observable": false,
+      "uriVariables": {
+        "name": {
+          "type": "string",
+          "readOnly": true,
+          "writeOnly": false,
+          "description": "The name of the datastream"
+        },
+        "time": {
+          "type": "string",
+          "readOnly": true,
+          "writeOnly": false,
+          "description": "The end time of the range of time, in format \"YYYY-MM-DDThh:mm:ssZ\" in the UTC timezone"
+        }
+      },
+      "forms": [
+        {
+          "href": "/properties/datastreamAggregateMeasure",
+          "contentType": "application/json",
+          "op": "readproperty",
+          "htv:methodName": "GET"
+        }
+      ],
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "deviceID": {
+            "type": "string",
+            "readOnly": true,
+            "writeOnly": false,
+            "description": "The ID of the sensor that took the measures"
+          },
+          "property_name": {
+            "type": "string",
+            "readOnly": true,
+            "writeOnly": false,
+            "description": "The name of the property observed in these measures"
+          },
+          "datastream_name": {
+            "type": "string",
+            "readOnly": true,
+            "writeOnly": false,
+            "description": "The name of the datastream containing the measures"
+          },
+          "unit_of_measurement": {
+            "type": "string",
+            "readOnly": true,
+            "writeOnly": false,
+            "description": "The unit of measurement of the observations"
+          },
+          "value": {
+            "type": "string",
+            "readOnly": true,
+            "writeOnly": false,
+            "description": "The value of the average of the observations"
+          },
+          "date": {
+            "type": "string",
+            "readOnly": true,
+            "writeOnly": false,
+            "description": "The ending date of the average of the observations"
+          }
+        }
+      }
+    },
+    "datastreamMeasures": {
+      "description": "All the measures of a specified datastream",
+      "readOnly": true,
+      "writeOnly": false,
+      "observable": false,
+      "uriVariables": {
+        "name": {
+          "type": "string",
+          "readOnly": true,
+          "writeOnly": false,
+          "description": "The name of the datasource"
+        },
+        "items": {
+          "type": "number",
+          "readOnly": true,
+          "writeOnly": false,
+          "description": "The maximum number of measures to return"
+        },
+        "page": {
+          "type": "number",
+          "readOnly": true,
+          "writeOnly": false,
+          "description": "Page number, from where to start retrieving the items"
+        }
+      },
+      "forms": [
+        {
+          "href": "/properties/datasourceMeasures",
+          "contentType": "application/json",
+          "op": "readproperty",
+          "htv:methodName": "GET"
+        }
+      ],
+      "type": "array",
+      "items": {
+        "readOnly": true,
+        "writeOnly": false,
+        "type": "object",
+        "properties": {
+          "deviceID": {
+            "type": "string",
+            "readOnly": true,
+            "writeOnly": false,
+            "description": "The ID of the sensor that took this measure"
+          },
+          "property_name": {
+            "type": "string",
+            "readOnly": true,
+            "writeOnly": false,
+            "description": "The name of the property observed in this measure"
+          },
+          "datastream_name": {
+            "type": "string",
+            "readOnly": true,
+            "writeOnly": false,
+            "description": "The name of the datastream containing this measure"
+          },
+          "unit_of_measurement": {
+            "type": "string",
+            "readOnly": true,
+            "writeOnly": false,
+            "description": "The unit of measurement of the observation"
+          },
+          "value": {
+            "type": "string",
+            "readOnly": true,
+            "writeOnly": false,
+            "description": "The value of the observation"
+          },
+          "time_of_measure": {
+            "type": "string",
+            "readOnly": true,
+            "writeOnly": false,
+            "description": "The time when the observation was taken"
+          }
+        }
+      }
+    },
+    "datastreamTimeRangeMeasures": {
+      "description": "All the measures in a range of time of a specified datastream",
+      "readOnly": true,
+      "writeOnly": false,
+      "observable": false,
+      "uriVariables": {
+        "name": {
+          "type": "string",
+          "readOnly": true,
+          "writeOnly": false,
+          "description": "The name of the datasource"
+        },
+        "start_time": {
+          "type": "string",
+          "readOnly": true,
+          "writeOnly": false,
+          "description": "The start time of the range of time, in format \"YYYY-MM-DDThh:mm:ssZ\" in the UTC timezone"
+        },
+        "end_time": {
+          "type": "string",
+          "readOnly": true,
+          "writeOnly": false,
+          "description": "The start time of the range of time, in format \"YYYY-MM-DDThh:mm:ssZ\" in the UTC timezone"
+        },
+        "items": {
+          "type": "number",
+          "readOnly": true,
+          "writeOnly": false,
+          "description": "The maximum number of measures to return"
+        },
+        "page": {
+          "type": "number",
+          "readOnly": true,
+          "writeOnly": false,
+          "description": "Page number, from where to start retrieving the items"
+        }
+      },
+      "forms": [
+        {
+          "href": "/properties/datasourceMeasures",
+          "contentType": "application/json",
+          "op": "readproperty",
+          "htv:methodName": "GET"
+        }
+      ],
+      "type": "array",
+      "items": {
+        "readOnly": true,
+        "writeOnly": false,
+        "type": "object",
+        "properties": {
+          "deviceID": {
+            "type": "string",
+            "readOnly": true,
+            "writeOnly": false,
+            "description": "The ID of the sensor that took this measure"
+          },
+          "property_name": {
+            "type": "string",
+            "readOnly": true,
+            "writeOnly": false,
+            "description": "The name of the property observed in this measure"
+          },
+          "datastream_name": {
+            "type": "string",
+            "readOnly": true,
+            "writeOnly": false,
+            "description": "The name of the datastream containing this measure"
+          },
+          "unit_of_measurement": {
+            "type": "string",
+            "readOnly": true,
+            "writeOnly": false,
+            "description": "The unit of measurement of the observation"
+          },
+          "value": {
+            "type": "string",
+            "readOnly": true,
+            "writeOnly": false,
+            "description": "The value of the observation"
+          },
+          "time_of_measure": {
+            "type": "string",
+            "readOnly": true,
+            "writeOnly": false,
+            "description": "The time when the observation was taken"
+          }
+        }
+      }
+    },
+    "lastMeasures": {
+      "description": "All the latest measures of the thing",
+      "readOnly": true,
+      "writeOnly": false,
+      "observable": false,
+      "forms": [
+        {
+          "href": "/properties/lastMeasures",
+          "contentType": "application/json",
+          "op": "readproperty",
+          "htv:methodName": "GET"
+        }
+      ],
+      "type": "array",
+      "items": {
+        "readOnly": true,
+        "writeOnly": false,
+        "type": "object",
+        "properties": {
+          "deviceID": {
+            "type": "string",
+            "readOnly": true,
+            "writeOnly": false,
+            "description": "The ID of the sensor that took this measure"
+          },
+          "property_name": {
+            "type": "string",
+            "readOnly": true,
+            "writeOnly": false,
+            "description": "The name of the property observed in this measure"
+          },
+          "datastream_name": {
+            "type": "string",
+            "readOnly": true,
+            "writeOnly": false,
+            "description": "The name of the datastream containing this measure"
+          },
+          "unit_of_measurement": {
+            "type": "string",
+            "readOnly": true,
+            "writeOnly": false,
+            "description": "The unit of measurement of the observation"
+          },
+          "value": {
+            "type": "string",
+            "readOnly": true,
+            "writeOnly": false,
+            "description": "The value of the observation"
+          },
+          "time_of_measure": {
+            "type": "string",
+            "readOnly": true,
+            "writeOnly": false,
+            "description": "The time when the observation was taken"
+          }
+        }
+      }
+    }
+  },
+  "actions": {
+    "receiveMeasure": {
+      "safe": true,
+      "idempotent": false,
+      "input": {
+        "type": "object",
+        "description": "The message that the sensor sends",
+        "readOnly": true,
+        "writeOnly": false,
+        "properties": {
+          "info": {
+            "type": "object",
+            "readOnly": true,
+            "writeOnly": false,
+            "description": "The necessary information to identify from which sensor is this data coming from",
+            "properties": {
+              "deviceID": {
+                "type": "string",
+                "readOnly": true,
+                "writeOnly": false,
+                "description": "The device's ID according to the list (D001, D002, I001, ...)"
+              }
+            }
+          },
+          "values": {
+            "type": "object",
+            "readOnly": true,
+            "writeOnly": false,
+            "description": "The observation values in key/value pairs. The keys must match the keys agreed on before.",
+            "properties": {}
+          }
+        }
+      },
+      "output": {
+        "description": "Returns true/false if measures were identified correctly, and a message",
+        "type": "object",
+        "properties": {
+          "result": {
+            "type": "boolean",
+            "readOnly": true,
+            "writeOnly": false
+          },
+          "message": {
+            "type": "string",
+            "readOnly": true,
+            "writeOnly": false
+          }
+        },
+        "readOnly": true,
+        "writeOnly": false
+      },
+      "forms": [
+        {
+          "href": "/actions/receiveMeasure",
+          "contentType": "application/json",
+          "op": "invokeaction",
+          "htv:methodName": "POST"
+        }
+      ]
+    },
+    "createSensor": {
+      "safe": true,
+      "idempotent": false,
+      "input": {
+        "type": "object",
+        "description": "Everything necessary for the action",
+        "readOnly": true,
+        "writeOnly": false,
+        "properties": {}
+      },
+      "output": {
+        "description": "Returns true/false if action was sent correctly, and a message",
+        "type": "object",
+        "properties": {},
+        "readOnly": true,
+        "writeOnly": false
+      },
+      "forms": [
+        {
+          "href": "/actions/createSensor",
+          "contentType": "application/json",
+          "op": "invokeaction",
+          "htv:methodName": "POST"
+        }
+      ]
+    }
+  },
+  "events": {
+    "newObservation": {
+      "description": "A new observation of the specified datastream has been added to the system",
+      "data": {
+        "type": "object",
+        "readOnly": true,
+        "writeOnly": false,
+        "properties": {
+          "deviceID": {
+            "type": "string",
+            "readOnly": true,
+            "writeOnly": false,
+            "description": "The device's ID according to the list (D001, D002, I001, ...)"
+          },
+          "observed_property": {
+            "type": "string",
+            "readOnly": true,
+            "writeOnly": false,
+            "description": "The device's observed propery, such as soilTemperature, soilMoisture,..."
+          },
+          "value": {
+            "type": "number",
+            "readOnly": true,
+            "writeOnly": false,
+            "description": "The value of the measurement"
+          },
+          "time": {
+            "type": "string",
+            "readOnly": true,
+            "writeOnly": false,
+            "description": "The time when this measurement was taken"
+          }
+        }
+      },
+      "forms": [
+        {
+          "href": "/events/newObservation",
+          "contentType": "application/json",
+          "op": "subscribeevent"
+        }
+      ]
+    }
+  }
+}

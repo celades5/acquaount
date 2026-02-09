@@ -8,7 +8,9 @@ import urllib3
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-baseurl = "http://sensorthings-api:8080/FROST-Server/v1.1"
+baseurl = "http://sensorthings-api:8080"
+
+frost_url_section = "/FROST-Server/v1.1"
 
 if __name__ in "__main__":
     print(sys.argv[0])
@@ -17,8 +19,9 @@ if __name__ in "__main__":
         sys.exit(-2)
     if len(sys.argv) < 3:
         print("Url missing, using default")
+        baseurl = baseurl + frost_url_section
     else:
-        baseurl = sys.argv[2]
+        baseurl = (sys.argv[2] + frost_url_section)
     with open(sys.argv[1], "r", errors="ignore") as f:
         reader = csv.DictReader(f, delimiter=";")
         for row in reader:

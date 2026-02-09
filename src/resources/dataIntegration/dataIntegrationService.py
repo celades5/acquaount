@@ -29,6 +29,7 @@ import enas
 
 filelock = threading.Lock()
 
+
 def dateformat_log(date):
     hour = "{:0>{}}".format(date.hour, 2)
     minute = "{:0>{}}".format(date.minute, 2)
@@ -148,7 +149,6 @@ if __name__ in "__main__":
     semaphore = threading.Semaphore(6)
     ftplock = threading.Lock()
 
-    # schedule.every(10).minutes.do(join_threads)
     print(len(sys.argv))
     if len(sys.argv) >= 2:
         if sys.argv[1] == "historic":
@@ -284,7 +284,8 @@ if __name__ in "__main__":
             "00204EB1"
         ]
         for station in fieldclimate_stations:
-            station_job = create_job(f"FieldClimate{station}",fieldclimate.get_function(station),send_timeseries_data,f"AcquaountLebanon{station}")
+            station_job = create_job(f"FieldClimate{station}", fieldclimate.get_function(station), send_timeseries_data,
+                                     f"AcquaountLebanon{station}")
             daily_jobs.append(station_job)
 
         with open("iradata_specification.json", "r") as f:
