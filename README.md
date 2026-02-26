@@ -74,7 +74,7 @@ Finally, all types of Things have the same event affordance, which can be subscr
 
  + newObservation: This event is triggered every time there is a new measure in the system.
 
-The Binding Templates defined inside the thing descriptions describe how to interact with the interaction affordances. For properties, they can be read using a GET request and request parameters, for actions, they can be invoked using a POST request and request body, and special clients can subscribe to events with a special handshake.  
+The Binding Templates defined inside the thing descriptions describe how to interact with the interaction affordances. For properties, they can be read using a GET request and request parameters, for actions, they can be invoked using a POST request and request body, and special clients can subscribe to events with a special handshake. To see in detail the required parameters to call an interaction affordance and the structure of its returns, check the [Base Thing Description](src/resources/thingDescription/Things/base.td.json).  
 
 ## Testing And Verification
 
