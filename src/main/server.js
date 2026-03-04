@@ -303,8 +303,14 @@ async function fetchFieldInformation(fieldName) {
             "location": {}
         }
     });
+    if (result === undefined) {
+        return result;
+    }
     result["location"] = await fetchFromDatabase(locationsUrl).then((data) => {
         var location = data["value"][0];
+        if (location === undefined) {
+            return {}
+        }
         return location["location"];
     })
     return result;
@@ -1008,7 +1014,7 @@ servient.start().then(async (WoT) => {
                 return {result: false, message: 'Something failed when accessing the database'};
             }
 
-            let jsonBase = readJsonFileSync('src/resources/thingDescription/Fields/base.td.json');
+            let jsonBase = readJsonFileSync('src/resources/thingDescription/Things/base.td.json');
 
             for (const key in jsonField) {
                 jsonBase[key] = jsonField[key];

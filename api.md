@@ -29,6 +29,7 @@ used for model outputs, so they are created with those datastreams by default.
 |------|-----------------------------------------------------------------|
 | 200  | Request received correctly, check status for success or failure |
 | 400  | Request is not formatted correctly                              |
+| 500  | Field already exists or field has no location                   |
 
 ### Request Example
 
@@ -364,11 +365,11 @@ datastream is not part of this thing, even if it does exist in the database.
 
 ### Return Codes
 
-| Code | Meaning                                                 |
-|------|---------------------------------------------------------|
-| 200  | Request correct                                         |
-| 400  | Request is not formatted correctly                      |
-| 404  | The field or the property are not found in the database |
+| Code | Meaning                                                   |
+|------|-----------------------------------------------------------|
+| 200  | Request correct                                           |
+| 400  | Request is not formatted correctly                        |
+| 404  | The field or the datastream are not found in the database |
 
 ### Request Success Example
 
