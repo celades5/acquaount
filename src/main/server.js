@@ -351,6 +351,7 @@ async function fetchSensorInAField(fieldName, sensorName) {
                 return sensor;
             }
         }
+        throw new Error("Sensor not found in this field");
     });
 }
 
@@ -382,6 +383,7 @@ async function fetchPropertyInAField(fieldName, propertyName) {
             return properties[i];
         }
     }
+    throw new Error("Property not found in this field");
 }
 
 async function fetchDeviceAndProperyFromDatastream(datastream) {
@@ -473,6 +475,7 @@ async function fetchDatastreamInAField(fieldName, datastreamName) {
                     }
                 }
             }
+            throw new Error("Datastream not found in this field");
         }
     );
 }
@@ -533,8 +536,7 @@ async function fetchWotObservation(datastream, measure) {
 async function fetchAllObservationsInDatastream(fieldName, datastreamName, items, page) {
     let datastream = await fetchDatastream(fieldName, datastreamName);
     if (datastream === undefined) {
-        console.log("ERROR: Datastream name might be wrong");
-        return undefined;
+        throw new Error("Datastream not found in this field");
     }
     let start_skip = items * page;
     let db_pages = Math.floor(items / 100);
@@ -569,8 +571,7 @@ async function fetchAllObservationsInDatastream(fieldName, datastreamName, items
 async function fetchAllObservationsInDatastreamInRange(fieldName, datastreamName, startTime, endTime, items, page) {
     let datastream = await fetchDatastream(fieldName, datastreamName);
     if (datastream === undefined) {
-        console.log("ERROR: Datastream name might be wrong");
-        return undefined;
+        throw new Error("Datastream not found in this field");
     }
     let start_skip = items * page;
     let db_pages = Math.floor(items / 100);
@@ -671,8 +672,7 @@ async function fetchAggregateObservationInDatastream(fieldName, datastreamName, 
 async function fetchLastObservationInDatastream(fieldName, datastreamName) {
     let datastream = await fetchDatastream(fieldName, datastreamName);
     if (datastream === undefined) {
-        console.log("ERROR: Datastream name might be wrong");
-        return undefined;
+        throw new Error("Datastream not found in this field");
     }
     return await fetchFromDatabase(datastream["Observations@iot.navigationLink"] + "?$orderby=phenomenonTime desc&$top=1").then(async (data) => {
         if (data["value"].length <= 0) {
@@ -854,14 +854,14 @@ async function produceFieldThing(thing) {
     thing.setActionHandler("receiveMeasure", async (_params, options) => {
         const params = await _params.value();
         if (!Object.keys(params).includes("info")) {
-            return {result: false, message: 'Info missing in message'};
+            throw new Error('Info missing in message');
         }
         if (!Object.keys(params['info']).includes("deviceID")) {
-            return {result: false, message: 'Device ID missing in message'};
+            throw new Error('Device ID is missing');
         }
 
         if (!Object.keys(params).includes("values")) {
-            return {result: false, message: 'Values missing in message'};
+            throw new Error('Values missing in message');
         }
         let sensorName = params["info"]["deviceID"];
         for (let i = 0; i < Object.keys(params["values"]).length; i++) {
@@ -872,7 +872,7 @@ async function produceFieldThing(thing) {
                 "(Thing/name eq '" + thing.getThingDescription().fieldName + "')"
             let result = await fetchFromDatabase(url);
             if (result['@iot.count'] === 0) {
-                return {result: false, message: 'Sensor and key value do not specify a datastream'};
+                throw new Error('Sensor and key value do not specify a datastream');
             }
             let datastreamId = 0;
             result.value.forEach(item => {
@@ -900,7 +900,7 @@ async function produceFieldThing(thing) {
 
             let response = await postToDatabase(url, observation_body);
             if (!response) {
-                return {result: false, message: 'Something failed when accessing the database'};
+                throw new Error('Something failed when accessing the database');
             }
             await writeToCSV(sensorName, observation_body.phenomenonTime);
             thing.emitEvent("newObservation", {
@@ -913,34 +913,7 @@ async function produceFieldThing(thing) {
         return {result: true, message: 'Observation(s) stored successfully'};
     });
 
-    thing.setActionHandler("createSensor", async (_params, options) => {
-        const params = await _params.value();
-        if (!Object.keys(params).includes("values")) {
-            return {result: false, message: 'values missing in message'};
-        }
-        // TODO Rebre paràmetres d'entrada
-
-        let sens = {
-            datastreams: [
-                {
-                    property_key: "air_temperature",
-                    property_name: "Air Temperature",
-                },
-                {
-                    property_key: "air_humidity",
-                    property_name: "Air Humidity",
-                }
-            ]
-        }
-
-        for (let datastr in sens["datastreams"]) {
-
-        }
-
-        return {message: 'Function not yet implemented'}
-    });
-
-    thing.getThingDescription().href = "84.88.76.18";
+    thing.getThingDescription().href = config_baseuri;
 
     thing.expose().then(() => {
         console.info(`${thing.getThingDescription().title} ready`);
@@ -958,7 +931,7 @@ servient.start().then(async (WoT) => {
         thing.setActionHandler("createThing", async (_params, options) => {
             const params = await _params.value();
             if (!Object.keys(params).includes("fieldName")) {
-                return {status: false, message: 'Field name missing in message'};
+                throw new Error('Field name missing in message')
             }
             let desc = "";
             if (Object.keys(params).includes("description")) {
@@ -995,7 +968,7 @@ servient.start().then(async (WoT) => {
             fs.writeFileSync(creationPath + fieldId + ".td.json", JSON.stringify(jsonField), {flag: 'w'}, function (err) {
                 if (err) {
                     console.log(err);
-                    return {status: true, message: 'Error writing the thing file'};
+                    throw new Error('Error writing the thing file');
                 }
             });
 
@@ -1011,7 +984,7 @@ servient.start().then(async (WoT) => {
 
             let response = await postToDatabase(things_url, thing_body);
             if (!response) {
-                return {result: false, message: 'Something failed when accessing the database'};
+                throw new Error('Something failed when accessing the database');
             }
 
             let jsonBase = readJsonFileSync('src/resources/thingDescription/Things/base.td.json');
@@ -1044,7 +1017,7 @@ servient.start().then(async (WoT) => {
             let thingType = params["thingType"];
             let thingsList = [];
             Object.values(servient.getThings()).forEach(thing => {
-                if (thing.thingType == thingType) {
+                if (thing.thingType === thingType) {
                     thingsList.push({
                         title: thing.title,
                         id: thing.id,

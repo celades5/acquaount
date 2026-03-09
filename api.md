@@ -2,7 +2,9 @@
 
 This file includes all endpoints available in WoT-Server. Keep in mind that this documentation does not include
 FROST-Server related endpoints, they can be found in
-the [FROST-Server's documentation](https://fraunhoferiosb.github.io/FROST-Server/).
+the [FROST-Server's documentation](https://fraunhoferiosb.github.io/FROST-Server/).  
+
+The WoT-Server only ever returns 200 status codes for successful operations, 500 status codes for failed or incorrect operations, and 404 status codes for routing mistakes, because the WoT syntax is designed to be protocol agnostic, only ever differentiating between success and error instead of different types of errors, however, all failed or incorrect operations return a string in the body describing what the error was. Only separating between success and error instead of different types of errors opens the door to developers that might want to use WoT-Server using a protocol that isn't HTTP. 
 
 ## Create Thing
 
@@ -25,11 +27,10 @@ used for model outputs, so they are created with those datastreams by default.
 
 ### Return Codes
 
-| Code | Meaning                                                         |
-|------|-----------------------------------------------------------------|
-| 200  | Request received correctly, check status for success or failure |
-| 400  | Request is not formatted correctly                              |
-| 500  | Field already exists or field has no location                   |
+| Code | Meaning                                                     |
+|------|-------------------------------------------------------------|
+| 200  | Success                                                     |
+| 500  | Field already exists, field has no location, or other error |
 
 ### Request Example
 
@@ -70,10 +71,10 @@ associated Pilot location, and coordinates.
 
 ### Return Codes
 
-| Code | Meaning                            |
-|------|------------------------------------|
-| 200  | Request successful                 |
-| 404  | Field is not found in the database |
+| Code | Meaning                                           |
+|------|---------------------------------------------------|
+| 200  | Request successful                                |
+| 500  | Field is not found in the database or other error |
 
 ### Request Success Example
 
@@ -135,10 +136,10 @@ links to related datastreams in the SensorThings server.
 
 ### Return Codes
 
-| Code | Meaning                            |
-|------|------------------------------------|
-| 200  | Request successful                 |
-| 404  | Field is not found in the database |
+| Code | Meaning                                           |
+|------|---------------------------------------------------|
+| 200  | Request successful                                |
+| 500  | Field is not found in the database or other error |
 
 ### Request Success Example
 
@@ -182,11 +183,10 @@ used for model outputs, so they are created with those datastreams by default.
 
 ### Return Codes
 
-| Code | Meaning                                               |
-|------|-------------------------------------------------------|
-| 200  | Request correct                                       |
-| 400  | Request is not formatted correctly                    |
-| 404  | The field or the sensor are not found in the database |
+| Code | Meaning                                                              |
+|------|----------------------------------------------------------------------|
+| 200  | Request correct                                                      |
+| 500  | The field or the sensor are not found in the database or other error |
 
 ### Request Success Example
 
@@ -222,10 +222,10 @@ internal links to related datastreams in the SensorThings server.
 
 ### Return Codes
 
-| Code | Meaning                            |
-|------|------------------------------------|
-| 200  | Request successful                 |
-| 404  | Field is not found in the database |
+| Code | Meaning                                           |
+|------|---------------------------------------------------|
+| 200  | Request successful                                |
+| 500  | Field is not found in the database or other error |
 
 ### Request Success Example
 
@@ -276,11 +276,10 @@ successful if the property exists in the database even if it is not being observ
 
 ### Return Codes
 
-| Code | Meaning                                                 |
-|------|---------------------------------------------------------|
-| 200  | Request correct                                         |
-| 400  | Request is not formatted correctly                      |
-| 404  | The field or the property are not found in the database |
+| Code | Meaning                                                                 |
+|------|-------------------------------------------------------------------------|
+| 200  | Request correct                                                         |
+| 500  | The field or the property are not found in the database, or other error |
 
 ### Request Success Example
 
@@ -314,10 +313,10 @@ names of the sensor that feeds this datastream, and the property being observed.
 
 ### Return Codes
 
-| Code | Meaning                            |
-|------|------------------------------------|
-| 200  | Request successful                 |
-| 404  | Field is not found in the database |
+| Code | Meaning                                           |
+|------|---------------------------------------------------|
+| 200  | Request successful                                |
+| 500  | Field is not found in the database or other error |
 
 ### Request Success Example
 
@@ -365,11 +364,10 @@ datastream is not part of this thing, even if it does exist in the database.
 
 ### Return Codes
 
-| Code | Meaning                                                   |
-|------|-----------------------------------------------------------|
-| 200  | Request correct                                           |
-| 400  | Request is not formatted correctly                        |
-| 404  | The field or the datastream are not found in the database |
+| Code | Meaning                                                                   |
+|------|---------------------------------------------------------------------------|
+| 200  | Request correct                                                           |
+| 500  | The field or the datastream are not found in the database, or other error |
 
 ### Request Success Example
 
@@ -406,11 +404,10 @@ datastream is not identified. It will also use the current time if the timestamp
 
 ### Return Codes
 
-| Code | Meaning                                                       |
-|------|---------------------------------------------------------------|
-| 200  | Request received correctly, check body for success or failure |
-| 400  | Request is not formatted correctly                            |
-| 404  | Field not found in the database                               |
+| Code | Meaning                                        |
+|------|------------------------------------------------|
+| 200  | Success                                        |
+| 500  | Field not found in the database or other error |
 
 ### Request Example
 
@@ -459,16 +456,10 @@ if the datastream is not part of this thing or if it doesn't have any measures.
 
 ### Return Codes
 
-| Code | Meaning                                                       |
-|------|---------------------------------------------------------------|
-| 200  | Request received correctly, check body for success or failure |
-| 400  | Request is not formatted correctly                            |
-
-### Request Example
-
-```json
-{}
-```
+| Code | Meaning                                            |
+|------|----------------------------------------------------|
+| 200  | Success                                            |
+| 500  | Request is not formatted correctly, or other error |
 
 ### Request Success Example
 
@@ -511,11 +502,10 @@ results.
 
 ### Return Codes
 
-| Code | Meaning                                                   |
-|------|-----------------------------------------------------------|
-| 200  | Request received correctly                                |
-| 400  | Request is not formatted correctly                        |
-| 404  | The field or the datastream are not found in the database |
+| Code | Meaning                                                                   |
+|------|---------------------------------------------------------------------------|
+| 200  | Request received correctly                                                |
+| 500  | The field or the datastream are not found in the database, or other error |
 
 ### Request Success Example
 
@@ -573,11 +563,10 @@ YYYY-MM-DDThh:mm:ssZ.
 
 ### Return Codes
 
-| Code | Meaning                                                   |
-|------|-----------------------------------------------------------|
-| 200  | Request received correctly                                |
-| 400  | Request is not formatted correctly                        |
-| 404  | The field or the datastream are not found in the database |
+| Code | Meaning                                                                   |
+|------|---------------------------------------------------------------------------|
+| 200  | Request received correctly                                                |
+| 500  | The field or the datastream are not found in the database, or other error |
 
 ### Request Success Example
 
@@ -622,11 +611,10 @@ This request will return the latest measure that has been stored in each of the 
 
 ### Return Codes
 
-| Code | Meaning                                |
-|------|----------------------------------------|
-| 200  | Request received correctly             |
-| 400  | Request is not formatted correctly     |
-| 404  | The field is not found in the database |
+| Code | Meaning                                                |
+|------|--------------------------------------------------------|
+| 200  | Request received correctly                             |
+| 500  | The field is not found in the database, or other error |
 
 ### Request Success Example
 
