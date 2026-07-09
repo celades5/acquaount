@@ -4,11 +4,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    volumes:
-      - ./src/main/:/usr/src/app/src/main
-      - ./src/resources/thingDescription/:/usr/src/app/src/resources/thingDescription
-      - ./src/resources/modelService/Irrigation Model/runs/:/usr/src/app/src/resources/modelService/Irrigation Model/runs
-      - ./src/resources/historicalData:/usr/src/app/src/resources/historicalData
     expose:
       - "80"
     depends_on:
